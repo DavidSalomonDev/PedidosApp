@@ -1,4 +1,4 @@
-package sv.edu.ues.pedidosapp.database;
+package sv.edu.ues.pedidosapp.dao;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -7,6 +7,8 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import java.util.List;
+
+import sv.edu.ues.pedidosapp.entity.Producto;
 
 @Dao
 public interface ProductoDao {
