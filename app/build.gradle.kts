@@ -35,6 +35,13 @@ android {
 }
 
 dependencies {
+    // Room components
+    implementation("androidx.room:room-runtime:2.5.0")
+    annotationProcessor("androidx.room:room-compiler:2.5.0")
+
+    // Lifecycle components (para ViewModels)
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.6.2")
 
     implementation(libs.appcompat)
     implementation(libs.material)
