@@ -13,6 +13,9 @@ import sv.edu.ues.pedidosapp.entity.Usuario;
 @Dao
 public interface UsuarioDao {
 
+    @Query("SELECT * FROM usuarios WHERE email = :email AND password = :password")
+    Usuario autenticarUsuario(String email, String password);
+
     @Query("SELECT * FROM usuarios ORDER BY nombre ASC")
     LiveData<List<Usuario>> getAllUsuarios();
 
@@ -20,7 +23,11 @@ public interface UsuarioDao {
     LiveData<Usuario> getUsuarioById(int id);
 
     @Query("SELECT * FROM usuarios WHERE email = :email")
-    LiveData<Usuario> getUsuarioByEmail(String email);
+    Usuario getUsuarioByEmail(String email);
+
+
+    @Query("SELECT * FROM usuarios WHERE nombre = :nombre")
+    Usuario getUsuarioByName(String nombre);
 
     @Insert
     long insertUsuario(Usuario usuario);

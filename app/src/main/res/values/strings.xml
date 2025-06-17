@@ -10,4 +10,23 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+
+
+    <string name="usuario">Usuario</string>
+    <string name="password">Password</string>
+    <string name="ingrese_usuario">Ingrese su nombre de usuario</string>
+    <string name="ingrese_password">Ingrese su contraseña</string>
+    <string name="ingresar">Ingresar</string>
+    <string name="salir">Salir</string>
+    <string name="registrar">Registrar</string>
+    <string name="app_logo">Logo de la aplicación</string>
+    <string name="person">Person</string>
+    <string name="title_activity_home2">HomeActivity2</string>
+
+
+    <string name="modo_oscuro">Modo Oscuro</string>
+    <string name="registrarse">Registrarse</string>
+    <string name="cambiar_tema">Cambiar tema</string>
+    <string name="tema_claro">Tema claro</string>
+    <string name="tema_oscuro">Tema oscuro</string>
 </resources>
