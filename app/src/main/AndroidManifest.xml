@@ -23,6 +23,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".RegistroActivity"
+            android:exported="false"
+            android:theme="@style/Theme.PedidosApp.NoActionBar"
+            android:parentActivityName=".MainActivity">
+            <!-- Opcional: meta-data para soporte de navegación up -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+        <!-- Actividad Principal después del Login -->
+        <activity
+            android:name=".DashboardActivity_test"
+            android:exported="false"
+            android:theme="@style/Theme.PedidosApp.NoActionBar"/>
+
     </application>
 
 </manifest>

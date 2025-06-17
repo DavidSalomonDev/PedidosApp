@@ -7,4 +7,31 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Colores primarios (azul profesional) -->
+    <color name="colorPrimary">#3F51B5</color>  <!-- Indigo 500 -->
+    <color name="colorPrimaryDark">#303F9F</color>  <!-- Indigo 700 -->
+    <color name="colorPrimaryLight">#C5CAE9</color>  <!-- Indigo 100 -->
+    <color name="red">#D53E06</color>
+
+
+    <!-- Color de acento (moderno) -->
+    <color name="colorAccent">#4CAF50</color>  <!-- Green 500 -->
+
+    <!-- Colores secundarios -->
+    <color name="colorSecondary">#607D8B</color>  <!-- Blue Grey 500 -->
+    <color name="colorSecondaryDark">#455A64</color>  <!-- Blue Grey 700 -->
+
+    <!-- Colores para texto -->
+    <color name="textColorPrimary">#212121</color>
+    <color name="textColorSecondary">#757575</color>
+    <color name="textOnPrimary">#FFFFFF</color>
+
+    <!-- Colores para botones -->
+    <color name="buttonPrimary">@color/colorPrimary</color>
+    <color name="buttonPrimaryPressed">@color/colorPrimaryDark</color>
+    <color name="buttonSecondary">#FFFFFF</color>
+    <color name="buttonSecondaryPressed">#EEEEEE</color>
+    <color name="buttonSecondaryBorder">@color/colorSecondary</color>
+    <color name="buttonSecondaryText">@color/colorSecondary</color>
 </resources>
