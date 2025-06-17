@@ -1,0 +1,35 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/item_pedido_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pedido #123"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    <TextView
+        android:id="@+id/item_pedido_fecha"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="10/05/2024 15:30"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+    <TextView
+        android:id="@+id/item_pedido_estado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Estado: Pendiente"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+    <TextView
+        android:id="@+id/item_pedido_total"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total: $25.50"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+</LinearLayout>
