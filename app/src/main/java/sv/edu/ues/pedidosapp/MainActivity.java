@@ -13,10 +13,10 @@ import android.widget.Toast;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import sv.edu.ues.pedidosapp.database.AppDatabase;
-import sv.edu.ues.pedidosapp.entity.Usuario;
+import sv.edu.ues.pedidosapp.data.local.db.AppDatabase;
+import sv.edu.ues.pedidosapp.data.local.entity.Usuario;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     private EditText txtUsuario, txtPassword;
     private Button btnIngresar, btnRegistrarse, btnSalir;
@@ -107,35 +107,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     // Buscar por email o por nombre
                     if (Patterns.EMAIL_ADDRESS.matcher(usuario).matches()) {
-                        usuarioEncontrado = database.usuarioDao().autenticarUsuario(usuario, password);
+                        usuarioEncontrado = database.usuarioDao().getUsuarioByName(usuario);
                     } else {
                         // Buscar por nombre y luego verificar password
-                        Usuario usuarioTemp = database.usuarioDao().getUsuarioByName(usuario);
+                        Usuario usuarioTemp = database.usuarioDao().getUsuarioByEmail(usuario);
                         if (usuarioTemp != null && usuarioTemp.getPassword().equals(password)) {
                             usuarioEncontrado = usuarioTemp;
                         }
                     }
 
-                    final Usuario usuarioFinal = usuarioEncontrado;
+                    final Usuario finalUsuario = usuarioEncontrado;
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            // Restaurar botón
-                            btnIngresar.setEnabled(true);
-                            btnIngresar.setText("INGRESAR");
-
-                            if (usuarioFinal != null) {
-                                // Guardar sesión en SharedPreferences
-                                guardarSesion(usuarioFinal);
-                                mostrarMensaje("Bienvenido " + usuarioFinal.getNombre());
+                            // Actualizar UI aquí
+                            if (finalUsuario != null) {
+                                // Login exitoso
+                                guardarSesion(finalUsuario);
+                                mostrarMensaje("Bienvenido " + finalUsuario.getNombre());
                                 irAPantallaPrincipal();
                             } else {
+                                // Login fallido
                                 mostrarMensaje("Usuario o contraseña incorrectos");
-                                // Limpiar campos por seguridad
                                 txtPassword.setText("");
                                 txtUsuario.requestFocus();
                             }
+                            btnIngresar.setEnabled(true);
+                            btnIngresar.setText("INGRESAR");
                         }
                     });
 
@@ -143,14 +142,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            // Restaurar botón
+                            mostrarMensaje("Error al conectar con la base de datos");
                             btnIngresar.setEnabled(true);
                             btnIngresar.setText("INGRESAR");
-                            mostrarMensaje("Error al conectar con la base de datos");
                         }
                     });
                 }
             }
+
         });
     }
 
@@ -189,7 +188,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         editor.putString("usuario_email", usuario.getEmail());
         editor.putString("usuario_nombre", usuario.getNombre());
         editor.putString("usuario_telefono", usuario.getTelefono());
-        editor.putInt("usuario_id", usuario.getId());
+        editor.putString("usuario_direccion", usuario.getDireccion());
+        editor.putInt("usuario_id", usuario.getIdUsuario());
         editor.putBoolean("sesion_activa", true);
         editor.putLong("timestamp_login", System.currentTimeMillis());
         editor.apply();

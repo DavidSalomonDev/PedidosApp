@@ -39,8 +39,8 @@ public class Usuario {
         this.email = email;
         this.password = password;
         this.telefono = telefono;
-        this.direccion = direccion;
-        this.fechaRegistro = fechaRegistro;
+       // this.direccion = direccion;
+       // this.fechaRegistro = fechaRegistro;
     }
 
     // Getters y Setters

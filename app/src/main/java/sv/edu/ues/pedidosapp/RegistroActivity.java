@@ -11,8 +11,9 @@ import android.widget.Toast;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import sv.edu.ues.pedidosapp.database.AppDatabase;
-import sv.edu.ues.pedidosapp.entity.Usuario;
+import sv.edu.ues.pedidosapp.data.local.entity.Usuario;
+import sv.edu.ues.pedidosapp.data.local.db.AppDatabase;
+
 
 public class RegistroActivity extends AppCompatActivity {
 
@@ -73,7 +74,14 @@ public class RegistroActivity extends AppCompatActivity {
         }
 
         // Crear usuario
-        Usuario nuevoUsuario = new Usuario(nombre, email, contrasenia, telefono);
+        Usuario nuevoUsuario = new Usuario(
+                nombre,
+                email,
+                contrasenia,
+                telefono,
+                "", // null por defecto, no esta incluida en el formulario de registro
+                System.currentTimeMillis() // Fecha de registro (timestamp actual)
+        );
 
         // Registrar en base de datos usando ExecutorService
         executor.execute(new Runnable() {

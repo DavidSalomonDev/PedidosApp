@@ -71,7 +71,7 @@ public class LoginFragment extends Fragment {
         registerTextView.setOnClickListener(v -> {
             Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_registerFragment);
         });
-
+/*
         // Observar el resultado del login
         authViewModel.getAuthResult().observe(getViewLifecycleOwner(), authResult -> {
             if (authResult.isSuccess()) {
@@ -90,5 +90,7 @@ public class LoginFragment extends Fragment {
                 Toast.makeText(getContext(), authResult.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+        */
+
     }
 }

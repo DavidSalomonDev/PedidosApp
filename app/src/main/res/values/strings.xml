@@ -29,4 +29,11 @@
     <string name="cambiar_tema">Cambiar tema</string>
     <string name="tema_claro">Tema claro</string>
     <string name="tema_oscuro">Tema oscuro</string>
+
+
+
+    <string name="menu_catalogo">Catálogo</string>
+    <string name="menu_pedidos">Pedidos</string>
+    <string name="menu_configuracion">Configuración</string>
+    <string name="menu_login">Login</string>
 </resources>
