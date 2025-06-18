@@ -73,7 +73,7 @@ public class RegisterFragment extends Fragment {
             // Registrar usuario
             authViewModel.registrarUsuario(usuario);
         });
-
+/*
         // Observar el resultado del registro
         authViewModel.getAuthResult().observe(getViewLifecycleOwner(), authResult -> {
             if (authResult.isSuccess()) {
@@ -91,6 +91,6 @@ public class RegisterFragment extends Fragment {
             } else {
                 Toast.makeText(getContext(), authResult.getMessage(), Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
     }
 }

@@ -1,6 +1,7 @@
 package sv.edu.ues.pedidosapp.data.local.dao;
 
 import androidx.lifecycle.LiveData;
+import androidx.room.ColumnInfo;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -66,10 +67,10 @@ public interface DetallePedidoDao {
     LiveData<Integer> getTotalCantidadByPedido(int idPedido);
 
     // Obtener productos más vendidos
-    @Query("SELECT id_producto, SUM(cantidad) as total_vendido " +
+    @Query("SELECT id_producto AS idProducto, SUM(cantidad) AS totalVendido " +
             "FROM detalle_pedidos " +
             "GROUP BY id_producto " +
-            "ORDER BY total_vendido DESC " +
+            "ORDER BY totalVendido DESC " +
             "LIMIT :limite")
     LiveData<List<ProductoVendido>> getProductosMasVendidos(int limite);
 
@@ -79,10 +80,14 @@ public interface DetallePedidoDao {
 
     // Clase para el resultado del JOIN
     public static class DetallePedidoConProducto {
+        @ColumnInfo(name = "id_detalle")
         public int idDetalle;
+        @ColumnInfo(name = "id_pedido")
         public int idPedido;
+        @ColumnInfo(name = "id_producto")
         public int idProducto;
         public int cantidad;
+        @ColumnInfo(name = "precio_unitario")
         public double precioUnitario;
         public double subtotal;
         public String nombreProducto;

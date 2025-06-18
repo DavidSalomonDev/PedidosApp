@@ -38,6 +38,9 @@ public interface UsuarioDao {
     @Query("SELECT * FROM usuarios WHERE email = :email LIMIT 1")
     Usuario getUsuarioByEmail(String email);
 
+    @Query("SELECT * FROM usuarios WHERE email = :nombre LIMIT 1")
+    Usuario getUsuarioByName(String nombre);
+
     // Verificar si existe un email
     @Query("SELECT COUNT(*) FROM usuarios WHERE email = :email")
     int checkEmailExists(String email);

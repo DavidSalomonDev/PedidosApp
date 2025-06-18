@@ -1,201 +1,245 @@
 package sv.edu.ues.pedidosapp;
 
+import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Patterns;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
+import sv.edu.ues.pedidosapp.data.local.db.AppDatabase;
+import sv.edu.ues.pedidosapp.data.local.entity.Usuario;
 
-import com.google.android.material.navigation.NavigationView;
+public class MainActivity extends AppCompatActivity {
 
-import sv.edu.ues.pedidosapp.features.auth.ui.LoginFragment;
-import sv.edu.ues.pedidosapp.features.configuracion.ui.ConfiguracionFragment;
-import sv.edu.ues.pedidosapp.features.configuracion.viewmodel.ConfiguracionViewModel;
-import sv.edu.ues.pedidosapp.features.core.ViewModelFactory;
-import sv.edu.ues.pedidosapp.features.pedidos.ui.ListaPedidosFragment;
-import sv.edu.ues.pedidosapp.features.productos.ui.CatalogoFragment;
-import sv.edu.ues.pedidosapp.utils.Constants;
-
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
-    private Toolbar toolbar;
-    private TextView headerUsername, headerEmail;
+    private EditText txtUsuario, txtPassword;
+    private Button btnIngresar, btnRegistrarse, btnSalir;
+    private AppDatabase database;
+    private ExecutorService executor;
     private SharedPreferences sharedPreferences;
-    private ConfiguracionViewModel configuracionViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Inicializar SharedPreferences
-        sharedPreferences = getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE);
+        inicializarComponentes();
+        configurarEventos();
 
-        // Inicializar ViewModel
-        ViewModelFactory factory = new ViewModelProvider(this, factory).get(ConfiguracionViewModel.class);
-        configuracionViewModel = new ViewModelProvider(this, factory).get(ConfiguracionViewModel.class);
+        // Inicializar base de datos, executor y SharedPreferences
+        database = AppDatabase.getDatabase(this);
+        executor = Executors.newSingleThreadExecutor();
+        sharedPreferences = getSharedPreferences("login_prefs", Context.MODE_PRIVATE);
 
-        // Inicializar vistas
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        // Verificar si hay sesión guardada
+        verificarSesionGuardada();
+    }
 
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
+    private void inicializarComponentes() {
+        txtUsuario = findViewById(R.id.txtUsuario);
+        txtPassword = findViewById(R.id.txtPassword);
+        btnIngresar = findViewById(R.id.btnIngresar);
+        btnRegistrarse = findViewById(R.id.btnRegistrarse);
+        btnSalir = findViewById(R.id.btnSalir);
+    }
 
-        // Configurar Navigation Drawer
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
-        navigationView.setNavigationItemSelectedListener(this);
-
-        // Obtener referencias a las vistas del header
-        View headerView = navigationView.getHeaderView(0);
-        headerUsername = headerView.findViewById(R.id.header_username);
-        headerEmail = headerView.findViewById(R.id.header_email);
-
-        // Cargar datos del usuario desde SharedPreferences
-        loadUserData();
-
-        // Cargar tema inicial
-        loadTheme();
-
-        // Observar cambios en el tema
-        configuracionViewModel.getThemeMode().observe(this, theme -> {
-            setThemeMode(theme);
+    private void configurarEventos() {
+        btnIngresar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iniciarSesion();
+            }
         });
 
-        // Mostrar fragmento inicial (Login o Catálogo)
-        if (isLoggedIn()) {
-            displayFragment(new CatalogoFragment());
-            navigationView.setCheckedItem(R.id.nav_catalogo);
-        } else {
-            displayFragment(new LoginFragment());
-            navigationView.setCheckedItem(R.id.nav_login);
+        btnRegistrarse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, RegistroActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btnSalir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finishAffinity(); // Cierra la aplicación completamente
+            }
+        });
+    }
+
+    private void verificarSesionGuardada() {
+        boolean sesionActiva = sharedPreferences.getBoolean("sesion_activa", false);
+        if (sesionActiva) {
+            String emailGuardado = sharedPreferences.getString("usuario_email", "");
+            String nombreGuardado = sharedPreferences.getString("usuario_nombre", "");
+            if (!emailGuardado.isEmpty()) {
+                mostrarMensaje("Bienvenido de nuevo " + nombreGuardado);
+                irAPantallaPrincipal();
+            }
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+    private void iniciarSesion() {
+        String usuario = txtUsuario.getText().toString().trim();
+        String password = txtPassword.getText().toString();
+
+        // Validar campos
+        if (!validarCampos(usuario, password)) {
+            return;
         }
+
+        // Deshabilitar botón mientras se procesa
+        btnIngresar.setEnabled(false);
+        btnIngresar.setText("Verificando...");
+
+        // Autenticar usuario usando ExecutorService
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Usuario usuarioEncontrado = null;
+
+                    // Buscar por email o por nombre
+                    if (Patterns.EMAIL_ADDRESS.matcher(usuario).matches()) {
+                        usuarioEncontrado = database.usuarioDao().getUsuarioByName(usuario);
+                    } else {
+                        // Buscar por nombre y luego verificar password
+                        Usuario usuarioTemp = database.usuarioDao().getUsuarioByEmail(usuario);
+                        if (usuarioTemp != null && usuarioTemp.getPassword().equals(password)) {
+                            usuarioEncontrado = usuarioTemp;
+                        }
+                    }
+
+                    final Usuario finalUsuario = usuarioEncontrado;
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Actualizar UI aquí
+                            if (finalUsuario != null) {
+                                // Login exitoso
+                                guardarSesion(finalUsuario);
+                                mostrarMensaje("Bienvenido " + finalUsuario.getNombre());
+                                irAPantallaPrincipal();
+                            } else {
+                                // Login fallido
+                                mostrarMensaje("Usuario o contraseña incorrectos");
+                                txtPassword.setText("");
+                                txtUsuario.requestFocus();
+                            }
+                            btnIngresar.setEnabled(true);
+                            btnIngresar.setText("INGRESAR");
+                        }
+                    });
+
+                } catch (Exception e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mostrarMensaje("Error al conectar con la base de datos");
+                            btnIngresar.setEnabled(true);
+                            btnIngresar.setText("INGRESAR");
+                        }
+                    });
+                }
+            }
+
+        });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+    private boolean validarCampos(String usuario, String password) {
+        // Validar usuario (puede ser email o nombre)
+        if (usuario.isEmpty()) {
+            txtUsuario.setError("Ingrese su usuario o email");
+            txtUsuario.requestFocus();
+            return false;
+        }
+
+        if (usuario.length() < 3) {
+            txtUsuario.setError("El usuario debe tener al menos 3 caracteres");
+            txtUsuario.requestFocus();
+            return false;
+        }
+
+        // Validar contraseña
+        if (password.isEmpty()) {
+            txtPassword.setError("Ingrese su contraseña");
+            txtPassword.requestFocus();
+            return false;
+        }
+
+        if (password.length() < 6) {
+            txtPassword.setError("La contraseña debe tener al menos 6 caracteres");
+            txtPassword.requestFocus();
+            return false;
+        }
+
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            displayFragment(new ConfiguracionFragment());
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_catalogo) {
-            displayFragment(new CatalogoFragment());
-        } else if (id == R.id.nav_pedidos) {
-            displayFragment(new ListaPedidosFragment());
-        } else if (id == R.id.nav_configuracion) {
-            displayFragment(new ConfiguracionFragment());
-        } else if (id == R.id.nav_login) {
-            // Cerrar sesión
-            logout();
-            displayFragment(new LoginFragment());
-        }
-
-        drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    // Método para mostrar un fragmento
-    public void displayFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.commit();
-    }
-
-    // Método para cargar datos del usuario desde SharedPreferences
-    private void loadUserData() {
-        String username = sharedPreferences.getString(Constants.PREF_USER_EMAIL, "Invitado");
-        String email = sharedPreferences.getString(Constants.PREF_USER_EMAIL, "invitado@example.com");
-
-        headerUsername.setText(username);
-        headerEmail.setText(email);
-    }
-
-    // Método para cerrar sesión
-    private void logout() {
+    private void guardarSesion(Usuario usuario) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove(Constants.PREF_USER_ID);
-        editor.remove(Constants.PREF_USER_EMAIL);
-        editor.putBoolean(Constants.PREF_IS_LOGGED_IN, false);
+        editor.putString("usuario_email", usuario.getEmail());
+        editor.putString("usuario_nombre", usuario.getNombre());
+        editor.putString("usuario_telefono", usuario.getTelefono());
+        editor.putString("usuario_direccion", usuario.getDireccion());
+        editor.putInt("usuario_id", usuario.getIdUsuario());
+        editor.putBoolean("sesion_activa", true);
+        editor.putLong("timestamp_login", System.currentTimeMillis());
         editor.apply();
 
-        loadUserData(); // Actualizar header
+        // Log para debug
+        System.out.println("Sesión guardada para: " + usuario.getNombre());
     }
 
-    // Método para cargar el tema desde SharedPreferences
-    private void loadTheme() {
-        String savedTheme = sharedPreferences.getString(Constants.PREF_THEME_MODE, Constants.THEME_SYSTEM);
-        setThemeMode(savedTheme);
+    private void irAPantallaPrincipal() {
+        // Aquí debes cambiar por tu actividad principal de la app
+        // Por ejemplo, si tienes una HomeActivity o MenuActivity:
+        // Intent intent = new Intent(this, HomeActivity.class);
+        // startActivity(intent);
+        // finish();
+
+        // Por ahora, crear una actividad temporal para mostrar que funciona
+        Intent intent = new Intent(this, DashboardActivity_test.class);
+        startActivity(intent);
+        finish();
     }
 
-    // Método para aplicar el tema
-    private void setThemeMode(String theme) {
-        switch (theme) {
-            case Constants.THEME_LIGHT:
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                break;
-            case Constants.THEME_DARK:
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                break;
-            default:
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                break;
+    private void mostrarMensaje(String mensaje) {
+        Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Limpiar campos cuando regrese a esta actividad
+        txtUsuario.setText("");
+        txtPassword.setText("");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (executor != null) {
+            executor.shutdown();
         }
     }
 
-    // Método para verificar si el usuario está logueado
-    private boolean isLoggedIn() {
-        return sharedPreferences.getBoolean(Constants.PREF_IS_LOGGED_IN, false);
+    // Método para cerrar sesión (usar en otras actividades)
+    public static void cerrarSesion(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("login_prefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
     }
 }

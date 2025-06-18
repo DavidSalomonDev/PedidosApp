@@ -24,7 +24,8 @@ public class ListaPedidosFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_lista_pedidos, container, false);
+        //se coloco un layout de prueba
+        return inflater.inflate(R.layout.activity_dashboard_test, container, false);
     }
 
     @Override

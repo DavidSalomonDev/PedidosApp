@@ -38,6 +38,7 @@ android {
 dependencies {
     // Room components
     implementation(libs.room.runtime)
+    implementation libs.firebase.crashlytics.buildtools
     annotationProcessor(libs.room.compiler)
 
     // Lifecycle components (para ViewModels)
@@ -56,4 +57,5 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 
     implementation(libs.picasso)
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
