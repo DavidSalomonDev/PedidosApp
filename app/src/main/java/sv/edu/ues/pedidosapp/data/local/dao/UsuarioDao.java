@@ -59,4 +59,6 @@ public interface UsuarioDao {
 
     @Query("DELETE FROM usuarios")
     void deleteAllUsuarios();
+
+
 }

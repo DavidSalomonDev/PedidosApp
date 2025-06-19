@@ -1,13 +1,14 @@
 package sv.edu.ues.pedidosapp.features.auth.ui;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,7 +23,7 @@ import sv.edu.ues.pedidosapp.R;
 import sv.edu.ues.pedidosapp.features.auth.viewmodel.AuthViewModel;
 import sv.edu.ues.pedidosapp.features.core.ViewModelFactory;
 import sv.edu.ues.pedidosapp.features.productos.ui.CatalogoFragment;
-import sv.edu.ues.pedidosapp.utils.Constants;
+import sv.edu.ues.pedidosapp.utils.SessionManager;
 
 public class LoginFragment extends Fragment {
 
@@ -30,7 +31,8 @@ public class LoginFragment extends Fragment {
     private EditText emailEditText, passwordEditText;
     private Button loginButton;
     private TextView registerTextView;
-    private SharedPreferences sharedPreferences;
+    private ProgressBar progressBar;
+    private SessionManager sessionManager;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -42,12 +44,24 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Inicializar SharedPreferences
-        sharedPreferences = getActivity().getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE);
+        initializeComponents(view);
+        checkExistingSession();
+        setupClickListeners();
+        observeViewModel();
+    }
+
+    private void initializeComponents(View view) {
+        // Inicializar SessionManager
+        sessionManager = new SessionManager(requireContext());
 
         // Inicializar ViewModel
-        ViewModelFactory factory = new ViewModelFactory(getActivity().getApplication());
-        authViewModel = new ViewModelProvider(this, factory).get(AuthViewModel.class);
+        try {
+            ViewModelFactory factory = new ViewModelFactory(requireActivity().getApplication());
+            authViewModel = new ViewModelProvider(this, factory).get(AuthViewModel.class);
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Error al inicializar la aplicación", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // Inicializar vistas
         emailEditText = view.findViewById(R.id.login_email_edit_text);
@@ -55,41 +69,137 @@ public class LoginFragment extends Fragment {
         loginButton = view.findViewById(R.id.login_button);
         registerTextView = view.findViewById(R.id.register_text_view);
 
-        // Listener para el botón de login
+        // Inicializar ProgressBar (si existe en el layout)
+        progressBar = view.findViewById(R.id.login_progress_bar);
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    private void checkExistingSession() {
+        // Si ya hay una sesión activa, navegar directamente al catálogo
+        if (sessionManager.isLoggedIn()) {
+            navigateToCatalog();
+        }
+    }
+
+    private void setupClickListeners() {
         loginButton.setOnClickListener(v -> {
-            String email = emailEditText.getText().toString().trim();
-            String password = passwordEditText.getText().toString().trim();
-
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(getContext(), "Por favor, ingrese email y contraseña", Toast.LENGTH_SHORT).show();
-                return;
+            if (validateInputs()) {
+                performLogin();
             }
-
-            authViewModel.login(email, password);
         });
 
-        // Listener para el TextView de registro
         registerTextView.setOnClickListener(v -> {
-            Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_registerFragment);
+            try {
+                Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_registerFragment);
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Error al navegar al registro", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private boolean validateInputs() {
+        String email = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
+
+        // Validar email
+        if (TextUtils.isEmpty(email)) {
+            emailEditText.setError("El email es requerido");
+            emailEditText.requestFocus();
+            return false;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailEditText.setError("Ingrese un email válido");
+            emailEditText.requestFocus();
+            return false;
+        }
+
+        // Validar contraseña
+        if (TextUtils.isEmpty(password)) {
+            passwordEditText.setError("La contraseña es requerida");
+            passwordEditText.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void performLogin() {
+        // Mostrar loading
+        setLoadingState(true);
+
+        String email = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
+
+        try {
+            authViewModel.login(email, password);
+        } catch (Exception e) {
+            setLoadingState(false);
+            Toast.makeText(getContext(), "Error al iniciar sesión: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void observeViewModel() {
+        authViewModel.getAuthResult().observe(getViewLifecycleOwner(), authResult -> {
+            setLoadingState(false);
+
+            if (authResult != null) {
+                if (authResult.isSuccess()) {
+                    // Obtener el usuario completo desde el repositorio
+                    obtenerUsuarioCompleto(authResult.getUserId());
+                } else {
+                    Toast.makeText(getContext(), authResult.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
         });
 
-        // Observar el resultado del login
-        authViewModel.getAuthResult().observe(getViewLifecycleOwner(), authResult -> {
-            if (authResult.isSuccess()) {
-                // Guardar datos del usuario en SharedPreferences
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putLong(Constants.PREF_USER_ID, authResult.getUserId());
-                editor.putString(Constants.PREF_USER_EMAIL, emailEditText.getText().toString().trim());
-                editor.putBoolean(Constants.PREF_IS_LOGGED_IN, true);
-                editor.apply();
+        // Observar cuando se obtiene el usuario completo
+        authViewModel.getUsuarioCompleto().observe(getViewLifecycleOwner(), usuario -> {
+            if (usuario != null) {
+                // Guardar sesión con datos completos
+                sessionManager.createLoginSession(usuario);
 
-                Toast.makeText(getContext(), authResult.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show();
 
                 // Navegar al catálogo
-                ((MainActivity) getActivity()).displayFragment(new CatalogoFragment());
-            } else {
-                Toast.makeText(getContext(), authResult.getMessage(), Toast.LENGTH_SHORT).show();
+                navigateToCatalog();
             }
         });
+    }
+
+    private void obtenerUsuarioCompleto(long userId) {
+        // Solicitar los datos completos del usuario
+        authViewModel.obtenerUsuarioPorId(userId);
+    }
+
+    private void setLoadingState(boolean isLoading) {
+        if (progressBar != null) {
+            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        }
+        loginButton.setEnabled(!isLoading);
+        loginButton.setText(isLoading ? "Iniciando sesión..." : "Iniciar Sesión");
+        emailEditText.setEnabled(!isLoading);
+        passwordEditText.setEnabled(!isLoading);
+        registerTextView.setEnabled(!isLoading);
+    }
+
+    private void navigateToCatalog() {
+        try {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).displayFragment(new CatalogoFragment());
+            }
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Error al navegar", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Limpiar referencias para evitar memory leaks
+        authViewModel = null;
+        sessionManager = null;
     }
 }

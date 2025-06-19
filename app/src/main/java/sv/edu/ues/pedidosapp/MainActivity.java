@@ -31,6 +31,7 @@ import sv.edu.ues.pedidosapp.features.core.ViewModelFactory;
 import sv.edu.ues.pedidosapp.features.pedidos.ui.ListaPedidosFragment;
 import sv.edu.ues.pedidosapp.features.productos.ui.CatalogoFragment;
 import sv.edu.ues.pedidosapp.utils.Constants;
+import sv.edu.ues.pedidosapp.utils.SessionManager;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -38,16 +39,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private Toolbar toolbar;
     private TextView headerUsername, headerEmail;
-    private SharedPreferences sharedPreferences;
+    private SessionManager sessionManager;
     private ConfiguracionViewModel configuracionViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // APLICAR EL TEMA ANTES DE setContentView
+        sessionManager = new SessionManager(this);
+        String savedTheme = sessionManager.getThemeMode();
+        setThemeMode(savedTheme);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Inicializar SharedPreferences
-        sharedPreferences = getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE);
 
         // Inicializar ViewModel
         ViewModelFactory factory = new ViewModelFactory(getApplication());
@@ -73,17 +76,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         headerUsername = headerView.findViewById(R.id.header_username);
         headerEmail = headerView.findViewById(R.id.header_email);
 
-        // Cargar datos del usuario desde SharedPreferences
+        // Cargar datos del usuario desde SessionManager
         loadUserData();
 
-        // Cargar tema inicial
-        loadTheme();
-
-        // Observar cambios en el tema
-        configuracionViewModel.getThemeMode().observe(this, this::setThemeMode);
+        // ELIMINAR ESTAS LÍNEAS QUE CAUSABAN EL LOOP:
+        // loadTheme();
+        // configuracionViewModel.getThemeMode().observe(this, this::setThemeMode);
 
         // Mostrar fragmento inicial (Login o Catálogo)
-        if (isLoggedIn()) {
+        if (sessionManager.isLoggedIn()) {
             displayFragment(new CatalogoFragment());
             navigationView.setCheckedItem(R.id.nav_catalogo);
         } else {
@@ -92,6 +93,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         initializeSeedData();
+
+        SharedPreferences prefs = getSharedPreferences("config_nav", Context.MODE_PRIVATE);
+        boolean openConfig = prefs.getBoolean("open_config", false);
+        if (openConfig) {
+            prefs.edit().putBoolean("open_config", false).commit();
+            displayFragment(new ConfiguracionFragment());
+            navigationView.setCheckedItem(R.id.nav_configuracion);
+        }
     }
 
     private void initializeSeedData() {
@@ -110,19 +119,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             displayFragment(new ConfiguracionFragment());
             return true;
@@ -133,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_catalogo) {
@@ -160,34 +163,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fragmentTransaction.commit();
     }
 
-    // Método para cargar datos del usuario desde SharedPreferences
-    private void loadUserData() {
-        String username = sharedPreferences.getString(Constants.PREF_USER_EMAIL, "Invitado");
-        String email = sharedPreferences.getString(Constants.PREF_USER_EMAIL, "invitado@example.com");
+    // Método para cargar datos del usuario desde SessionManager
+    public void loadUserData() {
+        if (sessionManager.isLoggedIn()) {
+            String username = sessionManager.getUserName();
+            String email = sessionManager.getUserEmail();
 
-        headerUsername.setText(username);
-        headerEmail.setText(email);
+            // Si el nombre está vacío, usar el email como nombre
+            if (username == null || username.trim().isEmpty()) {
+                username = email.split("@")[0]; // Usar la parte antes del @ como nombre
+            }
+
+            headerUsername.setText(username);
+            headerEmail.setText(email);
+        } else {
+            headerUsername.setText("Invitado");
+            headerEmail.setText("invitado@example.com");
+        }
     }
 
     // Método para cerrar sesión
     private void logout() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove(Constants.PREF_USER_ID);
-        editor.remove(Constants.PREF_USER_EMAIL);
-        editor.putBoolean(Constants.PREF_IS_LOGGED_IN, false);
-        editor.apply();
-
+        sessionManager.logout();
         loadUserData(); // Actualizar header
     }
 
-    // Método para cargar el tema desde SharedPreferences
-    private void loadTheme() {
-        String savedTheme = sharedPreferences.getString(Constants.PREF_THEME_MODE, Constants.THEME_SYSTEM);
+    // Método para cargar el tema desde SessionManager
+    public void loadTheme() {
+        String savedTheme = sessionManager.getThemeMode();
         setThemeMode(savedTheme);
     }
 
     // Método para aplicar el tema
-    private void setThemeMode(String theme) {
+    public void setThemeMode(String theme) {
         switch (theme) {
             case Constants.THEME_LIGHT:
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -201,8 +209,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    // Método para verificar si el usuario está logueado
-    private boolean isLoggedIn() {
-        return sharedPreferences.getBoolean(Constants.PREF_IS_LOGGED_IN, false);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Actualizar datos del usuario cada vez que la actividad se reanuda
+        loadUserData();
     }
 }

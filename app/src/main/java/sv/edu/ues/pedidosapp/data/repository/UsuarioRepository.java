@@ -1,6 +1,7 @@
 package sv.edu.ues.pedidosapp.data.repository;
 
 import android.app.Application;
+
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
@@ -26,9 +27,16 @@ public class UsuarioRepository extends BaseRepository {
         return allUsuarios;
     }
 
-    // Obtener usuario por ID
+    // Obtener usuario por ID (LiveData)
     public LiveData<Usuario> getUsuarioById(int idUsuario) {
         return usuarioDao.getUsuarioById(idUsuario);
+    }
+
+    // Obtener usuario por ID (asíncrono) - NUEVO MÉTODO
+    public CompletableFuture<Usuario> obtenerUsuarioPorId(long idUsuario) {
+        return CompletableFuture.supplyAsync(() -> {
+            return usuarioDao.getUsuarioByIdSync((int) idUsuario);
+        }, AppDatabase.databaseWriteExecutor);
     }
 
     // Insertar usuario
@@ -66,6 +74,13 @@ public class UsuarioRepository extends BaseRepository {
         }, AppDatabase.databaseWriteExecutor);
     }
 
+    // Obtener usuario por email (asíncrono) - NUEVO MÉTODO
+    public CompletableFuture<Usuario> obtenerUsuarioPorEmail(String email) {
+        return CompletableFuture.supplyAsync(() -> {
+            return usuarioDao.getUsuarioByEmail(email);
+        }, AppDatabase.databaseWriteExecutor);
+    }
+
     // Registrar nuevo usuario
     public CompletableFuture<RegistroResult> registrarUsuario(Usuario usuario) {
         return CompletableFuture.supplyAsync(() -> {
@@ -88,7 +103,7 @@ public class UsuarioRepository extends BaseRepository {
         }, AppDatabase.databaseWriteExecutor);
     }
 
-    // Obtener usuario por email
+    // Obtener usuario por email (síncrono) - mantenemos el método original
     public CompletableFuture<Usuario> getUsuarioByEmail(String email) {
         return CompletableFuture.supplyAsync(() -> {
             return usuarioDao.getUsuarioByEmail(email);
@@ -107,8 +122,16 @@ public class UsuarioRepository extends BaseRepository {
             this.userId = userId;
         }
 
-        public boolean isSuccess() { return success; }
-        public String getMessage() { return message; }
-        public long getUserId() { return userId; }
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public long getUserId() {
+            return userId;
+        }
     }
 }

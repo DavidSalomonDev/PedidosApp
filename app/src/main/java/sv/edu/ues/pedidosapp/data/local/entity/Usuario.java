@@ -10,7 +10,7 @@ public class Usuario {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id_usuario")
-    private int idUsuario;
+    private long idUsuario;
 
     @ColumnInfo(name = "nombre")
     private String nombre;
@@ -46,11 +46,11 @@ public class Usuario {
     }
 
     // Getters y Setters
-    public int getIdUsuario() {
+    public long getIdUsuario() {
         return idUsuario;
     }
 
-    public void setIdUsuario(int idUsuario) {
+    public void setIdUsuario(long idUsuario) {
         this.idUsuario = idUsuario;
     }
 

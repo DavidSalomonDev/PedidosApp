@@ -1,5 +1,7 @@
 package sv.edu.ues.pedidosapp.features.configuracion.ui;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,16 +12,14 @@ import android.widget.RadioGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import sv.edu.ues.pedidosapp.R;
-import sv.edu.ues.pedidosapp.features.configuracion.viewmodel.ConfiguracionViewModel;
-import sv.edu.ues.pedidosapp.features.core.ViewModelFactory;
 import sv.edu.ues.pedidosapp.utils.Constants;
+import sv.edu.ues.pedidosapp.utils.SessionManager;
 
 public class ConfiguracionFragment extends Fragment {
 
-    private ConfiguracionViewModel configuracionViewModel;
+    private SessionManager sessionManager;
     private RadioGroup themeRadioGroup;
     private RadioButton lightThemeRadioButton, darkThemeRadioButton, systemThemeRadioButton;
 
@@ -33,45 +33,56 @@ public class ConfiguracionFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Inicializar ViewModel
-        ViewModelFactory factory = new ViewModelFactory(getActivity().getApplication());
-        configuracionViewModel = new ViewModelProvider(this, factory).get(ConfiguracionViewModel.class);
+        sessionManager = new SessionManager(requireContext());
 
-        // Inicializar vistas
         themeRadioGroup = view.findViewById(R.id.theme_radio_group);
         lightThemeRadioButton = view.findViewById(R.id.light_theme_radio_button);
         darkThemeRadioButton = view.findViewById(R.id.dark_theme_radio_button);
         systemThemeRadioButton = view.findViewById(R.id.system_theme_radio_button);
 
-        // Cargar tema actual
+        // Cargar tema actual y marcar el RadioButton correspondiente
         loadCurrentTheme();
 
         // Listener para cambios en el tema
         themeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            String theme = Constants.THEME_SYSTEM;
+            String selectedTheme = Constants.THEME_SYSTEM;
             if (checkedId == R.id.light_theme_radio_button) {
-                theme = Constants.THEME_LIGHT;
+                selectedTheme = Constants.THEME_LIGHT;
             } else if (checkedId == R.id.dark_theme_radio_button) {
-                theme = Constants.THEME_DARK;
+                selectedTheme = Constants.THEME_DARK;
             }
-            configuracionViewModel.saveThemeMode(theme);
+
+            String currentTheme = sessionManager.getThemeMode();
+
+            // Solo guardar y recrear si el tema realmente cambió
+            if (!selectedTheme.equals(currentTheme)) {
+                sessionManager.setThemeMode(selectedTheme);
+
+                // Guardar flag para volver a configuración tras recreate
+                SharedPreferences prefs = requireActivity().getSharedPreferences("config_nav", Context.MODE_PRIVATE);
+                prefs.edit().putBoolean("open_config", true).commit(); // Usar commit() en vez de apply()
+
+                requireActivity().recreate();
+            }
         });
     }
 
-    // Método para cargar el tema actual
     private void loadCurrentTheme() {
-        configuracionViewModel.getThemeMode().observe(getViewLifecycleOwner(), theme -> {
-            switch (theme) {
-                case Constants.THEME_LIGHT:
-                    lightThemeRadioButton.setChecked(true);
-                    break;
-                case Constants.THEME_DARK:
-                    darkThemeRadioButton.setChecked(true);
-                    break;
-                default:
-                    systemThemeRadioButton.setChecked(true);
-                    break;
-            }
-        });
+        String currentTheme = sessionManager.getThemeMode();
+
+        // Quitar listener temporalmente para evitar que se dispare al marcar
+        themeRadioGroup.setOnCheckedChangeListener(null);
+
+        switch (currentTheme) {
+            case Constants.THEME_LIGHT:
+                lightThemeRadioButton.setChecked(true);
+                break;
+            case Constants.THEME_DARK:
+                darkThemeRadioButton.setChecked(true);
+                break;
+            default:
+                systemThemeRadioButton.setChecked(true);
+                break;
+        }
     }
 }
