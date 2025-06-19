@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
@@ -92,7 +93,10 @@ public class LoginFragment extends Fragment {
 
         registerTextView.setOnClickListener(v -> {
             try {
-                Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_registerFragment);
+                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, new RegisterFragment()); // Asegúrate del ID correcto del contenedor
+                transaction.addToBackStack(null);
+                transaction.commit();
             } catch (Exception e) {
                 Toast.makeText(getContext(), "Error al navegar al registro", Toast.LENGTH_SHORT).show();
             }

@@ -43,8 +43,8 @@ public interface UsuarioDao {
     int checkEmailExists(String email);
 
     // Login - verificar credenciales
-    @Query("SELECT * FROM usuarios WHERE email = :email AND password = :password LIMIT 1")
-    Usuario login(String email, String password);
+    @Query("SELECT * FROM usuarios WHERE (email = :input OR nombre = :input) AND password = :password LIMIT 1")
+    Usuario login(String input, String password);
 
     // Obtener usuario por ID (síncrono)
     @Query("SELECT * FROM usuarios WHERE id_usuario = :idUsuario")

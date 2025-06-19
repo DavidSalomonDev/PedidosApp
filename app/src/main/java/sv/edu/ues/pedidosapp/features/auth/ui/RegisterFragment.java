@@ -9,11 +9,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import sv.edu.ues.pedidosapp.MainActivity;
@@ -28,6 +30,8 @@ public class RegisterFragment extends Fragment {
 
     private AuthViewModel authViewModel;
     private EditText nombreEditText, emailEditText, passwordEditText, telefonoEditText, direccionEditText;
+
+    private TextView loginTextView;
     private Button registerButton;
     private ProgressBar progressBar;
     private SessionManager sessionManager;
@@ -67,6 +71,7 @@ public class RegisterFragment extends Fragment {
         telefonoEditText = view.findViewById(R.id.register_telefono_edit_text);
         direccionEditText = view.findViewById(R.id.register_direccion_edit_text);
         registerButton = view.findViewById(R.id.register_button);
+        loginTextView = view.findViewById(R.id.login_text_view);
 
         // Inicializar ProgressBar (si existe en el layout)
         progressBar = view.findViewById(R.id.register_progress_bar);
@@ -195,6 +200,27 @@ public class RegisterFragment extends Fragment {
         registerButton.setEnabled(!isLoading);
         registerButton.setText(isLoading ? "Registrando..." : "Registrarse");
     }
+
+    private void setupClickListeners2() {
+        registerButton.setOnClickListener(v -> {
+            if (validateInputs()) {
+                performRegistration();
+            }
+        });
+
+        loginTextView.setOnClickListener(v -> {
+            try {
+                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, new LoginFragment()); // Verifica que este ID sea correcto
+                transaction.addToBackStack(null);
+                transaction.commit();
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Error al navegar al login", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
 
     private void navigateToCatalog() {
         try {
