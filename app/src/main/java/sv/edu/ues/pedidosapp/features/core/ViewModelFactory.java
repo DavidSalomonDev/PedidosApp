@@ -12,7 +12,7 @@ import sv.edu.ues.pedidosapp.features.configuracion.viewmodel.ConfiguracionViewM
 
 public class ViewModelFactory implements ViewModelProvider.Factory {
 
-    private Application application;
+    private final Application application;
 
     public ViewModelFactory(Application application) {
         this.application = application;
@@ -20,6 +20,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
 
     @NonNull
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(AuthViewModel.class)) {
             return (T) new AuthViewModel(application);

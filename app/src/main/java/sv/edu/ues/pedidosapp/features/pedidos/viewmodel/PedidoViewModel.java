@@ -1,38 +1,31 @@
-// sv/edu/ues/pedidosapp/features/pedidos/viewmodel/PedidoViewModel.java
 package sv.edu.ues.pedidosapp.features.pedidos.viewmodel;
 
 import android.app.Application;
+
 import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import sv.edu.ues.pedidosapp.data.local.entity.Pedido;
-import sv.edu.ues.pedidosapp.data.local.entity.DetallePedido;
 import sv.edu.ues.pedidosapp.data.repository.PedidoRepository;
-import sv.edu.ues.pedidosapp.features.core.BaseViewModel;
 
-public class PedidoViewModel extends BaseViewModel {
+public class PedidoViewModel extends AndroidViewModel {
 
-    private PedidoRepository pedidoRepository;
-    private LiveData<List<Pedido>> allPedidos;
-    private MutableLiveData<PedidoResult> pedidoResult = new MutableLiveData<>();
+    private final PedidoRepository pedidoRepository;
+    private final MutableLiveData<String> operationResult = new MutableLiveData<>();
 
     public PedidoViewModel(@NonNull Application application) {
         super(application);
-        pedidoRepository = repositoryManager.getPedidoRepository();
-        allPedidos = pedidoRepository.getAllPedidos();
+        pedidoRepository = new PedidoRepository(application);
     }
 
-    // LiveData para observar todos los pedidos
+    // Obtener todos los pedidos
     public LiveData<List<Pedido>> getAllPedidos() {
-        return allPedidos;
-    }
-
-    // LiveData para observar el resultado de las operaciones
-    public LiveData<PedidoResult> getPedidoResult() {
-        return pedidoResult;
+        return pedidoRepository.getAllPedidos();
     }
 
     // Obtener pedidos por usuario
@@ -50,19 +43,18 @@ public class PedidoViewModel extends BaseViewModel {
         return pedidoRepository.getPedidosByEstado(estado);
     }
 
-    // Obtener pedidos por usuario y estado
-    public LiveData<List<Pedido>> getPedidosByUsuarioAndEstado(int idUsuario, String estado) {
-        return pedidoRepository.getPedidosByUsuarioAndEstado(idUsuario, estado);
-    }
-
-    // Insertar pedido completo
-    public void insertPedidoCompleto(Pedido pedido, List<DetallePedido> detalles) {
-        pedidoRepository.insertPedidoCompleto(pedido, detalles)
+    // Insertar pedido
+    public void insertPedido(Pedido pedido) {
+        pedidoRepository.insertPedido(pedido)
                 .thenAccept(result -> {
-                    pedidoResult.postValue(new PedidoResult(true, "Pedido creado exitosamente", result.getPedidoId()));
+                    if (result > 0) {
+                        operationResult.postValue("Pedido creado exitosamente");
+                    } else {
+                        operationResult.postValue("Error al crear el pedido");
+                    }
                 })
-                .exceptionally(e -> {
-                    pedidoResult.postValue(new PedidoResult(false, "Error: " + e.getMessage(), -1));
+                .exceptionally(throwable -> {
+                    operationResult.postValue("Error: " + throwable.getMessage());
                     return null;
                 });
     }
@@ -71,72 +63,73 @@ public class PedidoViewModel extends BaseViewModel {
     public void updatePedido(Pedido pedido) {
         pedidoRepository.updatePedido(pedido)
                 .thenAccept(result -> {
-                    pedidoResult.postValue(new PedidoResult(result > 0, "Pedido actualizado exitosamente", pedido.getIdPedido()));
+                    if (result > 0) {
+                        operationResult.postValue("Pedido actualizado exitosamente");
+                    } else {
+                        operationResult.postValue("Error al actualizar el pedido");
+                    }
                 })
-                .exceptionally(e -> {
-                    pedidoResult.postValue(new PedidoResult(false, "Error: " + e.getMessage(), -1));
+                .exceptionally(throwable -> {
+                    operationResult.postValue("Error: " + throwable.getMessage());
+                    return null;
+                });
+    }
+
+    // Eliminar pedido
+    public void deletePedido(Pedido pedido) {
+        pedidoRepository.deletePedido(pedido)
+                .thenAccept(result -> {
+                    if (result > 0) {
+                        operationResult.postValue("Pedido eliminado exitosamente");
+                    } else {
+                        operationResult.postValue("Error al eliminar el pedido");
+                    }
+                })
+                .exceptionally(throwable -> {
+                    operationResult.postValue("Error: " + throwable.getMessage());
+                    return null;
+                });
+    }
+
+    // Eliminar pedido por ID
+    public void deletePedidoById(int idPedido) {
+        pedidoRepository.deletePedidoById(idPedido)
+                .thenAccept(result -> {
+                    if (result > 0) {
+                        operationResult.postValue("Pedido eliminado exitosamente");
+                    } else {
+                        operationResult.postValue("Error al eliminar el pedido");
+                    }
+                })
+                .exceptionally(throwable -> {
+                    operationResult.postValue("Error: " + throwable.getMessage());
                     return null;
                 });
     }
 
     // Actualizar estado del pedido
-    public void updateEstadoPedido(int idPedido, String estado) {
-        pedidoRepository.updateEstadoPedido(idPedido, estado)
+    public void updateEstadoPedido(int idPedido, String nuevoEstado) {
+        pedidoRepository.updateEstadoPedido(idPedido, nuevoEstado)
                 .thenAccept(result -> {
-                    pedidoResult.postValue(new PedidoResult(result > 0, "Estado actualizado exitosamente", idPedido));
+                    if (result > 0) {
+                        operationResult.postValue("Estado del pedido actualizado exitosamente");
+                    } else {
+                        operationResult.postValue("Error al actualizar el estado del pedido");
+                    }
                 })
-                .exceptionally(e -> {
-                    pedidoResult.postValue(new PedidoResult(false, "Error: " + e.getMessage(), -1));
+                .exceptionally(throwable -> {
+                    operationResult.postValue("Error: " + throwable.getMessage());
                     return null;
                 });
     }
 
-    // Eliminar pedido completo
-    public void deletePedidoCompleto(int idPedido) {
-        pedidoRepository.deletePedidoCompleto(idPedido)
-                .thenAccept(result -> {
-                    pedidoResult.postValue(new PedidoResult(result, "Pedido eliminado exitosamente", idPedido));
-                })
-                .exceptionally(e -> {
-                    pedidoResult.postValue(new PedidoResult(false, "Error: " + e.getMessage(), -1));
-                    return null;
-                });
+    // Obtener resultado de operaciones
+    public LiveData<String> getOperationResult() {
+        return operationResult;
     }
 
-    // Obtener pedidos por rango de fechas
-    public LiveData<List<Pedido>> getPedidosByFechaRange(long fechaInicio, long fechaFin) {
-        return pedidoRepository.getPedidosByFechaRange(fechaInicio, fechaFin);
-    }
-
-    // Obtener total de ventas por usuario
-    public LiveData<Double> getTotalVentasByUsuario(int idUsuario) {
-        return pedidoRepository.getTotalVentasByUsuario(idUsuario);
-    }
-
-    // Contar pedidos por estado
-    public LiveData<Integer> countPedidosByEstado(String estado) {
-        return pedidoRepository.countPedidosByEstado(estado);
-    }
-
-    // Obtener últimos pedidos
-    public LiveData<List<Pedido>> getUltimosPedidos(int limite) {
-        return pedidoRepository.getUltimosPedidos(limite);
-    }
-
-    // Clase para encapsular el resultado de las operaciones
-    public static class PedidoResult {
-        private boolean success;
-        private String message;
-        private long pedidoId;
-
-        public PedidoResult(boolean success, String message, long pedidoId) {
-            this.success = success;
-            this.message = message;
-            this.pedidoId = pedidoId;
-        }
-
-        public boolean isSuccess() { return success; }
-        public String getMessage() { return message; }
-        public long getPedidoId() { return pedidoId; }
+    // Limpiar resultado de operaciones
+    public void clearOperationResult() {
+        operationResult.setValue(null);
     }
 }

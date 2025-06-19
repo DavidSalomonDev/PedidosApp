@@ -2,13 +2,12 @@ package sv.edu.ues.pedidosapp.data.repository;
 
 import android.app.Application;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import sv.edu.ues.pedidosapp.data.local.AppDatabase;
 import sv.edu.ues.pedidosapp.data.local.dao.UsuarioDao;
-import sv.edu.ues.pedidosapp.data.local.db.AppDatabase;
 import sv.edu.ues.pedidosapp.data.local.entity.Usuario;
 
 public class UsuarioRepository extends BaseRepository {

@@ -2,10 +2,13 @@ package sv.edu.ues.pedidosapp.data.local.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(tableName = "productos")
-public class Producto {
+public class Producto implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id_producto")
@@ -34,6 +37,7 @@ public class Producto {
     }
 
     // Constructor completo
+    @Ignore
     public Producto(String nombre, String descripcion, double precio, String categoria, String imagenUrl, boolean disponible) {
         this.nombre = nombre;
         this.descripcion = descripcion;

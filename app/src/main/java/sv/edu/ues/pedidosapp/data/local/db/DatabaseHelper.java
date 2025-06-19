@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import sv.edu.ues.pedidosapp.data.local.AppDatabase;
 import sv.edu.ues.pedidosapp.data.local.entity.Producto;
 import sv.edu.ues.pedidosapp.data.local.entity.Usuario;
 
@@ -15,18 +16,18 @@ public class DatabaseHelper {
     private final AppDatabase database;
 
     public DatabaseHelper(Context context) {
-        database = AppDatabase.getDatabase(context);
+        database = AppDatabase.getInstance(context);
     }
 
     // Método para verificar si la base de datos tiene datos
     public CompletableFuture<Boolean> isDatabaseEmpty() {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                List<Usuario> usuarios = database.usuarioDao().getAllUsuarios().getValue();
-                List<Producto> productos = database.productoDao().getAllProductos().getValue();
+                // Usar métodos síncronos en lugar de LiveData
+                int usuarioCount = database.usuarioDao().getUserCount();
+                int productoCount = database.productoDao().getProductoCount();
 
-                return (usuarios == null || usuarios.isEmpty()) &&
-                        (productos == null || productos.isEmpty());
+                return usuarioCount == 0 && productoCount == 0;
             } catch (Exception e) {
                 return true; // Asumir vacía si hay error
             }
@@ -35,7 +36,17 @@ public class DatabaseHelper {
 
     // Método para limpiar toda la base de datos
     public void clearAllTables() {
-        AppDatabase.databaseWriteExecutor.execute(database::clearAllTables);
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            try {
+                // Limpiar cada tabla individualmente
+                database.detallePedidoDao().deleteAllDetallesPedidos();
+                database.pedidoDao().deleteAllPedidos();
+                database.productoDao().deleteAllProductos();
+                database.usuarioDao().deleteAllUsuarios();
+            } catch (Exception e) {
+                // Manejar error
+            }
+        });
     }
 
     // Método para hacer backup de datos críticos
@@ -72,23 +83,19 @@ public class DatabaseHelper {
     }
 
     private int countUsuarios() {
-        // Implementar conteo
-        return 0;
+        return database.usuarioDao().getUserCount();
     }
 
     private int countProductos() {
-        // Implementar conteo
-        return 0;
+        return database.productoDao().getProductoCount();
     }
 
     private int countPedidos() {
-        // Implementar conteo
-        return 0;
+        return database.pedidoDao().getPedidoCount();
     }
 
     private int countDetallesPedidos() {
-        // Implementar conteo
-        return 0;
+        return database.detallePedidoDao().getDetallePedidoCount();
     }
 
     // Clase para estadísticas

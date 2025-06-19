@@ -1,43 +1,31 @@
 package sv.edu.ues.pedidosapp.features.productos.viewmodel;
 
 import android.app.Application;
+
 import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-
-import java.util.List;
+import androidx.paging.PagingData;
 
 import sv.edu.ues.pedidosapp.data.local.entity.Producto;
 import sv.edu.ues.pedidosapp.data.repository.ProductoRepository;
-import sv.edu.ues.pedidosapp.features.core.BaseViewModel;
 
-public class ProductoViewModel extends BaseViewModel {
+public class ProductoViewModel extends AndroidViewModel {
 
-    private ProductoRepository productoRepository;
-    private LiveData<List<Producto>> allProductos;
-    private LiveData<List<Producto>> productosDisponibles;
-    private MutableLiveData<ProductoResult> productoResult = new MutableLiveData<>();
+    private final ProductoRepository productoRepository;
+    private final LiveData<PagingData<Producto>> productoPagingData;
+    private final MutableLiveData<String> operationResult = new MutableLiveData<>();
 
     public ProductoViewModel(@NonNull Application application) {
         super(application);
-        productoRepository = repositoryManager.getProductoRepository();
-        allProductos = productoRepository.getAllProductos();
-        productosDisponibles = productoRepository.getProductosDisponibles();
+        productoRepository = new ProductoRepository(application);
+        productoPagingData = productoRepository.getAllProductosPagingData();
     }
 
-    // LiveData para observar todos los productos
-    public LiveData<List<Producto>> getAllProductos() {
-        return allProductos;
-    }
-
-    // LiveData para observar productos disponibles
-    public LiveData<List<Producto>> getProductosDisponibles() {
-        return productosDisponibles;
-    }
-
-    // LiveData para observar el resultado de las operaciones
-    public LiveData<ProductoResult> getProductoResult() {
-        return productoResult;
+    // Obtener todos los productos (Paginado)
+    public LiveData<PagingData<Producto>> getAllProductosPagingData() {
+        return productoPagingData;
     }
 
     // Obtener producto por ID
@@ -45,83 +33,93 @@ public class ProductoViewModel extends BaseViewModel {
         return productoRepository.getProductoById(idProducto);
     }
 
-    // Obtener productos por categoría
-    public LiveData<List<Producto>> getProductosByCategoria(String categoria) {
-        return productoRepository.getProductosByCategoria(categoria);
+    // Obtener productos por categoría (Paginado)
+    public LiveData<PagingData<Producto>> getProductosByCategoriaPagingData(String categoria) {
+        return productoRepository.getProductosByCategoriaPagingData(categoria);
     }
 
-    // Buscar productos por nombre
-    public LiveData<List<Producto>> searchProductosByNombre(String nombre) {
-        return productoRepository.searchProductosByNombre(nombre);
+    // Obtener productos disponibles (Paginado)
+    public LiveData<PagingData<Producto>> getProductosDisponiblesPagingData() {
+        return productoRepository.getProductosDisponiblesPagingData();
     }
 
-    // Obtener categorías
-    public LiveData<List<String>> getCategorias() {
-        return productoRepository.getCategorias();
+    // Buscar productos por nombre (Paginado)
+    public LiveData<PagingData<Producto>> buscarProductosPorNombrePagingData(String nombre) {
+        return productoRepository.buscarProductosPorNombrePagingData(nombre);
     }
 
     // Insertar producto
     public void insertProducto(Producto producto) {
-        productoRepository.insertProducto(producto)
-                .thenAccept(id -> {
-                    productoResult.postValue(new ProductoResult(true, "Producto creado exitosamente", id));
-                })
-                .exceptionally(e -> {
-                    productoResult.postValue(new ProductoResult(false, "Error: " + e.getMessage(), -1));
-                    return null;
-                });
+        productoRepository.insertProducto(producto).thenAccept(result -> {
+            if (result > 0) {
+                operationResult.postValue("Producto creado exitosamente");
+            } else {
+                operationResult.postValue("Error al crear el producto");
+            }
+        }).exceptionally(throwable -> {
+            operationResult.postValue("Error: " + throwable.getMessage());
+            return null;
+        });
     }
 
     // Actualizar producto
     public void updateProducto(Producto producto) {
-        productoRepository.updateProducto(producto)
-                .thenAccept(result -> {
-                    productoResult.postValue(new ProductoResult(result > 0, "Producto actualizado exitosamente", producto.getIdProducto()));
-                })
-                .exceptionally(e -> {
-                    productoResult.postValue(new ProductoResult(false, "Error: " + e.getMessage(), -1));
-                    return null;
-                });
+        productoRepository.updateProducto(producto).thenAccept(result -> {
+            if (result > 0) {
+                operationResult.postValue("Producto actualizado exitosamente");
+            } else {
+                operationResult.postValue("Error al actualizar el producto");
+            }
+        }).exceptionally(throwable -> {
+            operationResult.postValue("Error: " + throwable.getMessage());
+            return null;
+        });
     }
 
     // Eliminar producto
     public void deleteProducto(Producto producto) {
-        productoRepository.deleteProducto(producto)
-                .thenAccept(result -> {
-                    productoResult.postValue(new ProductoResult(result > 0, "Producto eliminado exitosamente", producto.getIdProducto()));
-                })
-                .exceptionally(e -> {
-                    productoResult.postValue(new ProductoResult(false, "Error: " + e.getMessage(), -1));
-                    return null;
-                });
+        productoRepository.deleteProducto(producto).thenAccept(result -> {
+            if (result > 0) {
+                operationResult.postValue("Producto eliminado exitosamente");
+            } else {
+                operationResult.postValue("Error al eliminar el producto");
+            }
+        }).exceptionally(throwable -> {
+            operationResult.postValue("Error: " + throwable.getMessage());
+            return null;
+        });
     }
 
-    // Cambiar disponibilidad
-    public void updateDisponibilidad(int idProducto, boolean disponible) {
-        productoRepository.updateDisponibilidad(idProducto, disponible)
-                .thenAccept(result -> {
-                    productoResult.postValue(new ProductoResult(result > 0, "Disponibilidad actualizada", idProducto));
-                })
-                .exceptionally(e -> {
-                    productoResult.postValue(new ProductoResult(false, "Error: " + e.getMessage(), -1));
-                    return null;
-                });
+    // Eliminar producto por ID
+    public void deleteProductoById(int idProducto) {
+        productoRepository.deleteProductoById(idProducto).thenAccept(result -> {
+            if (result > 0) {
+                operationResult.postValue("Producto eliminado exitosamente");
+            } else {
+                operationResult.postValue("Error al eliminar el producto");
+            }
+        }).exceptionally(throwable -> {
+            operationResult.postValue("Error: " + throwable.getMessage());
+            return null;
+        });
     }
 
-    // Clase para encapsular el resultado de las operaciones
-    public static class ProductoResult {
-        private boolean success;
-        private String message;
-        private long productoId;
+    // Actualizar disponibilidad del producto
+    public void updateDisponibilidadProducto(int idProducto, boolean disponible) {
+        productoRepository.updateDisponibilidadProducto(idProducto, disponible).thenAccept(result -> {
+            if (result > 0) {
+                operationResult.postValue("Disponibilidad del producto actualizada exitosamente");
+            } else {
+                operationResult.postValue("Error al actualizar la disponibilidad del producto");
+            }
+        }).exceptionally(throwable -> {
+            operationResult.postValue("Error: " + throwable.getMessage());
+            return null;
+        });
+    }
 
-        public ProductoResult(boolean success, String message, long productoId) {
-            this.success = success;
-            this.message = message;
-            this.productoId = productoId;
-        }
-
-        public boolean isSuccess() { return success; }
-        public String getMessage() { return message; }
-        public long getProductoId() { return productoId; }
+    // Obtener resultado de operaciones
+    public LiveData<String> getOperationResult() {
+        return operationResult;
     }
 }

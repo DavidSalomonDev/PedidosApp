@@ -22,6 +22,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.navigation.NavigationView;
 
+import sv.edu.ues.pedidosapp.data.local.AppDatabase;
+import sv.edu.ues.pedidosapp.data.local.SeedDataHelper;
 import sv.edu.ues.pedidosapp.features.auth.ui.LoginFragment;
 import sv.edu.ues.pedidosapp.features.configuracion.ui.ConfiguracionFragment;
 import sv.edu.ues.pedidosapp.features.configuracion.viewmodel.ConfiguracionViewModel;
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         sharedPreferences = getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE);
 
         // Inicializar ViewModel
-        ViewModelFactory factory = new ViewModelProvider(this, factory).get(ConfiguracionViewModel.class);
+        ViewModelFactory factory = new ViewModelFactory(getApplication());
         configuracionViewModel = new ViewModelProvider(this, factory).get(ConfiguracionViewModel.class);
 
         // Inicializar vistas
@@ -78,9 +80,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         loadTheme();
 
         // Observar cambios en el tema
-        configuracionViewModel.getThemeMode().observe(this, theme -> {
-            setThemeMode(theme);
-        });
+        configuracionViewModel.getThemeMode().observe(this, this::setThemeMode);
 
         // Mostrar fragmento inicial (Login o Catálogo)
         if (isLoggedIn()) {
@@ -90,6 +90,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             displayFragment(new LoginFragment());
             navigationView.setCheckedItem(R.id.nav_login);
         }
+
+        initializeSeedData();
+    }
+
+    private void initializeSeedData() {
+        AppDatabase database = AppDatabase.getInstance(this);
+        SeedDataHelper.insertSeedData(database);
     }
 
     @Override

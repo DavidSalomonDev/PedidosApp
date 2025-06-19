@@ -3,9 +3,16 @@ package sv.edu.ues.pedidosapp.data.local.entity;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "detalle_pedidos",
+        indices = {
+                @Index(value = "id_detalle"),
+                @Index(value = "id_pedido"),
+                @Index(value = "id_producto")
+        },
         foreignKeys = {
                 @ForeignKey(entity = Pedido.class,
                         parentColumns = "id_pedido",
@@ -14,7 +21,7 @@ import androidx.room.PrimaryKey;
                 @ForeignKey(entity = Producto.class,
                         parentColumns = "id_producto",
                         childColumns = "id_producto",
-                        onDelete = ForeignKey.CASCADE)
+                        onDelete = ForeignKey.CASCADE),
         })
 public class DetallePedido {
 
@@ -41,13 +48,14 @@ public class DetallePedido {
     public DetallePedido() {
     }
 
-    // Constructor completo
-    public DetallePedido(int idPedido, int idProducto, int cantidad, double precioUnitario, double subtotal) {
+    // Constructor con parámetros
+    @Ignore
+    public DetallePedido(int idPedido, int idProducto, int cantidad, double precioUnitario) {
         this.idPedido = idPedido;
         this.idProducto = idProducto;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
-        this.subtotal = subtotal;
+        this.subtotal = cantidad * precioUnitario;
     }
 
     // Getters y Setters
@@ -81,6 +89,7 @@ public class DetallePedido {
 
     public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
+        this.subtotal = cantidad * precioUnitario; // Recalcular subtotal
     }
 
     public double getPrecioUnitario() {
@@ -89,6 +98,7 @@ public class DetallePedido {
 
     public void setPrecioUnitario(double precioUnitario) {
         this.precioUnitario = precioUnitario;
+        this.subtotal = cantidad * precioUnitario; // Recalcular subtotal
     }
 
     public double getSubtotal() {

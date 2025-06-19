@@ -7,6 +7,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import java.util.Date;
 import java.util.List;
 
 import sv.edu.ues.pedidosapp.data.local.entity.Pedido;
@@ -73,4 +74,14 @@ public interface PedidoDao {
     // Obtener últimos pedidos (límite)
     @Query("SELECT * FROM pedidos ORDER BY fecha_pedido DESC LIMIT :limite")
     LiveData<List<Pedido>> getUltimosPedidos(int limite);
+
+    @Query("SELECT COUNT(*) FROM pedidos")
+    int getPedidoCount();
+
+    @Query("DELETE FROM pedidos")
+    void deleteAllPedidos();
+
+    // Obtener pedidos por rango de fechas
+    @Query("SELECT * FROM pedidos WHERE fecha_pedido >= :fechaInicio AND fecha_pedido <= :fechaFin ORDER BY fecha_pedido DESC")
+    LiveData<List<Pedido>> getPedidosByRangoFechas(Date fechaInicio, Date fechaFin);
 }

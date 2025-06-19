@@ -1,36 +1,38 @@
 package sv.edu.ues.pedidosapp.data.repository;
 
 import android.app.Application;
+
 import androidx.lifecycle.LiveData;
+import androidx.paging.Pager;
+import androidx.paging.PagingConfig;
+import androidx.paging.PagingData;
+import androidx.paging.PagingLiveData;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
+import sv.edu.ues.pedidosapp.data.local.AppDatabase;
 import sv.edu.ues.pedidosapp.data.local.dao.ProductoDao;
-import sv.edu.ues.pedidosapp.data.local.db.AppDatabase;
 import sv.edu.ues.pedidosapp.data.local.entity.Producto;
 
-public class ProductoRepository extends BaseRepository {
+public class ProductoRepository {
 
-    private ProductoDao productoDao;
-    private LiveData<List<Producto>> allProductos;
-    private LiveData<List<Producto>> productosDisponibles;
+    private final ProductoDao productoDao;
+    private final Executor executor = Executors.newSingleThreadExecutor();
 
     public ProductoRepository(Application application) {
-        super(application);
+        AppDatabase database = AppDatabase.getInstance(application);
         productoDao = database.productoDao();
-        allProductos = productoDao.getAllProductos();
-        productosDisponibles = productoDao.getProductosDisponibles();
     }
 
-    // Obtener todos los productos
-    public LiveData<List<Producto>> getAllProductos() {
-        return allProductos;
-    }
-
-    // Obtener productos disponibles
-    public LiveData<List<Producto>> getProductosDisponibles() {
-        return productosDisponibles;
+    // Obtener todos los productos (Paginado)
+    public LiveData<PagingData<Producto>> getAllProductosPagingData() {
+        Pager<Integer, Producto> pager = new Pager<>(
+                new PagingConfig(20, 10, false, 100),
+                productoDao::getAllProductosPagingSource
+        );
+        return PagingLiveData.getLiveData(pager);
     }
 
     // Obtener producto por ID
@@ -38,67 +40,65 @@ public class ProductoRepository extends BaseRepository {
         return productoDao.getProductoById(idProducto);
     }
 
-    // Obtener productos por categoría
-    public LiveData<List<Producto>> getProductosByCategoria(String categoria) {
-        return productoDao.getProductosByCategoria(categoria);
+    // Obtener productos por categoría (Paginado)
+    public LiveData<PagingData<Producto>> getProductosByCategoriaPagingData(String categoria) {
+        Pager<Integer, Producto> pager = new Pager<>(
+                new PagingConfig(20, 10, false, 100),
+                () -> productoDao.getProductosByCategoriaPagingSource(categoria)
+        );
+        return PagingLiveData.getLiveData(pager);
     }
 
-    // Buscar productos por nombre
-    public LiveData<List<Producto>> searchProductosByNombre(String nombre) {
-        return productoDao.searchProductosByNombre(nombre);
+    // Obtener productos disponibles (Paginado)
+    public LiveData<PagingData<Producto>> getProductosDisponiblesPagingData() {
+        Pager<Integer, Producto> pager = new Pager<>(
+                new PagingConfig(20, 10, false, 100),
+                productoDao::getProductosDisponiblesPagingSource
+        );
+        return PagingLiveData.getLiveData(pager);
     }
 
-    // Obtener categorías
-    public LiveData<List<String>> getCategorias() {
-        return productoDao.getCategorias();
+    // Buscar productos por nombre (Paginado)
+    public LiveData<PagingData<Producto>> buscarProductosPorNombrePagingData(String nombre) {
+        Pager<Integer, Producto> pager = new Pager<>(
+                new PagingConfig(20, 10, false, 100),
+                () -> productoDao.buscarProductosPorNombrePagingSource(nombre)
+        );
+        return PagingLiveData.getLiveData(pager);
     }
 
     // Insertar producto
     public CompletableFuture<Long> insertProducto(Producto producto) {
         return CompletableFuture.supplyAsync(() -> {
             return productoDao.insertProducto(producto);
-        }, AppDatabase.databaseWriteExecutor);
-    }
-
-    // Insertar múltiples productos
-    public CompletableFuture<Void> insertProductos(List<Producto> productos) {
-        return CompletableFuture.runAsync(() -> {
-            productoDao.insertProductos(productos);
-        }, AppDatabase.databaseWriteExecutor);
+        }, executor);
     }
 
     // Actualizar producto
     public CompletableFuture<Integer> updateProducto(Producto producto) {
         return CompletableFuture.supplyAsync(() -> {
             return productoDao.updateProducto(producto);
-        }, AppDatabase.databaseWriteExecutor);
+        }, executor);
     }
 
     // Eliminar producto
     public CompletableFuture<Integer> deleteProducto(Producto producto) {
         return CompletableFuture.supplyAsync(() -> {
             return productoDao.deleteProducto(producto);
-        }, AppDatabase.databaseWriteExecutor);
+        }, executor);
     }
 
-    // Cambiar disponibilidad
-    public CompletableFuture<Integer> updateDisponibilidad(int idProducto, boolean disponible) {
+    // Eliminar producto por ID
+    public CompletableFuture<Integer> deleteProductoById(int idProducto) {
         return CompletableFuture.supplyAsync(() -> {
-            return productoDao.updateDisponibilidad(idProducto, disponible);
-        }, AppDatabase.databaseWriteExecutor);
+            return productoDao.deleteProductoById(idProducto);
+        }, executor);
     }
 
-    // Obtener producto por ID (síncrono)
-    public CompletableFuture<Producto> getProductoByIdSync(int idProducto) {
+    // Actualizar disponibilidad del producto
+    public CompletableFuture<Integer> updateDisponibilidadProducto(int idProducto, boolean disponible) {
         return CompletableFuture.supplyAsync(() -> {
-            return productoDao.getProductoByIdSync(idProducto);
-        }, AppDatabase.databaseWriteExecutor);
-    }
-
-    // Contar productos por categoría
-    public CompletableFuture<Integer> countProductosByCategoria(String categoria) {
-        return CompletableFuture.supplyAsync(() -> {
-            return productoDao.countProductosByCategoria(categoria);
-        }, AppDatabase.databaseWriteExecutor);
+            return productoDao.updateDisponibilidadProducto(idProducto, disponible);
+        }, executor);
     }
 }

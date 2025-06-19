@@ -1,0 +1,7 @@
+<resources>
+    <string-array name="categorias_productos">
+        <item>Comida</item>
+        <item>Bebida</item>
+        <item>Postre</item>
+    </string-array>
+</resources>

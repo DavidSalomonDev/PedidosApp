@@ -20,6 +20,7 @@ import sv.edu.ues.pedidosapp.R;
 import sv.edu.ues.pedidosapp.data.local.entity.Usuario;
 import sv.edu.ues.pedidosapp.features.auth.viewmodel.AuthViewModel;
 import sv.edu.ues.pedidosapp.features.core.ViewModelFactory;
+import sv.edu.ues.pedidosapp.features.productos.ui.CatalogoFragment;
 import sv.edu.ues.pedidosapp.utils.Constants;
 
 public class RegisterFragment extends Fragment {

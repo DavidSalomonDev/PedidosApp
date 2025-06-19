@@ -3,13 +3,17 @@ package sv.edu.ues.pedidosapp.data.local.entity;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "pedidos",
         foreignKeys = @ForeignKey(entity = Usuario.class,
                 parentColumns = "id_usuario",
                 childColumns = "id_usuario",
-                onDelete = ForeignKey.CASCADE))
+                onDelete = ForeignKey.CASCADE),
+        indices = {@Index(value = "id_usuario")}
+)
 public class Pedido {
 
     @PrimaryKey(autoGenerate = true)
@@ -39,6 +43,7 @@ public class Pedido {
     }
 
     // Constructor completo
+    @Ignore
     public Pedido(int idUsuario, long fechaPedido, String estado, double total, String direccionEntrega, String notas) {
         this.idUsuario = idUsuario;
         this.fechaPedido = fechaPedido;

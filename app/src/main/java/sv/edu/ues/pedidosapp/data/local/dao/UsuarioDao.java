@@ -53,4 +53,10 @@ public interface UsuarioDao {
     // Eliminar usuario por ID
     @Query("DELETE FROM usuarios WHERE id_usuario = :idUsuario")
     int deleteUsuarioById(int idUsuario);
+
+    @Query("SELECT COUNT(*) FROM usuarios")
+    int getUserCount();
+
+    @Query("DELETE FROM usuarios")
+    void deleteAllUsuarios();
 }

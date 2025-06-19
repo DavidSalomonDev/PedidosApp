@@ -1,32 +1,53 @@
+// sv/edu/ues/pedidosapp/data/repository/DetallePedidoRepository.java
 package sv.edu.ues.pedidosapp.data.repository;
 
 import android.app.Application;
+
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
+import sv.edu.ues.pedidosapp.data.local.AppDatabase;
 import sv.edu.ues.pedidosapp.data.local.dao.DetallePedidoDao;
-import sv.edu.ues.pedidosapp.data.local.db.AppDatabase;
 import sv.edu.ues.pedidosapp.data.local.entity.DetallePedido;
 
-public class DetallePedidoRepository extends BaseRepository {
+public class DetallePedidoRepository {
 
     private DetallePedidoDao detallePedidoDao;
+    private Executor executor = Executors.newSingleThreadExecutor();
 
     public DetallePedidoRepository(Application application) {
-        super(application);
+        AppDatabase database = AppDatabase.getInstance(application);
         detallePedidoDao = database.detallePedidoDao();
     }
 
-    // Obtener detalles por pedido
-    public LiveData<List<DetallePedido>> getDetallesByPedido(int idPedido) {
-        return detallePedidoDao.getDetallesByPedido(idPedido);
+    // Insertar detalle de pedido
+    public CompletableFuture<Long> insertDetallePedido(DetallePedido detallePedido) {
+        return CompletableFuture.supplyAsync(() -> {
+            return detallePedidoDao.insertDetallePedido(detallePedido);
+        }, executor);
     }
 
-    // Obtener detalles con información del producto
-    public LiveData<List<DetallePedidoDao.DetallePedidoConProducto>> getDetallesConProducto(int idPedido) {
-        return detallePedidoDao.getDetallesConProducto(idPedido);
+    // Actualizar detalle de pedido
+    public CompletableFuture<Integer> updateDetallePedido(DetallePedido detallePedido) {
+        return CompletableFuture.supplyAsync(() -> {
+            return detallePedidoDao.updateDetallePedido(detallePedido);
+        }, executor);
+    }
+
+    // Eliminar detalle de pedido
+    public CompletableFuture<Integer> deleteDetallePedido(DetallePedido detallePedido) {
+        return CompletableFuture.supplyAsync(() -> {
+            return detallePedidoDao.deleteDetallePedido(detallePedido);
+        }, executor);
+    }
+
+    // Obtener detalles de un pedido específico
+    public LiveData<List<DetallePedido>> getDetallesByPedido(int idPedido) {
+        return detallePedidoDao.getDetallesByPedido(idPedido);
     }
 
     // Obtener detalle por ID
@@ -34,69 +55,15 @@ public class DetallePedidoRepository extends BaseRepository {
         return detallePedidoDao.getDetalleById(idDetalle);
     }
 
-    // Insertar detalle
-    public CompletableFuture<Long> insertDetallePedido(DetallePedido detallePedido) {
-        return CompletableFuture.supplyAsync(() -> {
-            return detallePedidoDao.insertDetallePedido(detallePedido);
-        }, AppDatabase.databaseWriteExecutor);
-    }
-
-    // Insertar múltiples detalles
-    public CompletableFuture<Void> insertDetallesPedido(List<DetallePedido> detallesPedido) {
-        return CompletableFuture.runAsync(() -> {
-            detallePedidoDao.insertDetallesPedido(detallesPedido);
-        }, AppDatabase.databaseWriteExecutor);
-    }
-
-    // Actualizar detalle
-    public CompletableFuture<Integer> updateDetallePedido(DetallePedido detallePedido) {
-        return CompletableFuture.supplyAsync(() -> {
-            return detallePedidoDao.updateDetallePedido(detallePedido);
-        }, AppDatabase.databaseWriteExecutor);
-    }
-
-    // Actualizar cantidad de un detalle
-    public CompletableFuture<Integer> updateCantidadDetalle(int idDetalle, int cantidad, double subtotal) {
-        return CompletableFuture.supplyAsync(() -> {
-            return detallePedidoDao.updateCantidadDetalle(idDetalle, cantidad, subtotal);
-        }, AppDatabase.databaseWriteExecutor);
-    }
-
-    // Eliminar detalle
-    public CompletableFuture<Integer> deleteDetallePedido(DetallePedido detallePedido) {
-        return CompletableFuture.supplyAsync(() -> {
-            return detallePedidoDao.deleteDetallePedido(detallePedido);
-        }, AppDatabase.databaseWriteExecutor);
-    }
-
     // Eliminar todos los detalles de un pedido
     public CompletableFuture<Integer> deleteDetallesByPedido(int idPedido) {
         return CompletableFuture.supplyAsync(() -> {
             return detallePedidoDao.deleteDetallesByPedido(idPedido);
-        }, AppDatabase.databaseWriteExecutor);
+        }, executor);
     }
 
-    // Obtener cantidad total de productos en un pedido
-    public LiveData<Integer> getTotalCantidadByPedido(int idPedido) {
-        return detallePedidoDao.getTotalCantidadByPedido(idPedido);
-    }
-
-    // Obtener productos más vendidos
-    public LiveData<List<DetallePedidoDao.ProductoVendido>> getProductosMasVendidos(int limite) {
-        return detallePedidoDao.getProductosMasVendidos(limite);
-    }
-
-    // Verificar si un producto está en algún pedido
-    public CompletableFuture<Boolean> isProductoEnPedidos(int idProducto) {
-        return CompletableFuture.supplyAsync(() -> {
-            return detallePedidoDao.countDetallesByProducto(idProducto) > 0;
-        }, AppDatabase.databaseWriteExecutor);
-    }
-
-    // Obtener detalles por pedido (síncrono)
-    public CompletableFuture<List<DetallePedido>> getDetallesByPedidoSync(int idPedido) {
-        return CompletableFuture.supplyAsync(() -> {
-            return detallePedidoDao.getDetallesByPedidoSync(idPedido);
-        }, AppDatabase.databaseWriteExecutor);
+    // Obtener la suma total de un pedido
+    public LiveData<Double> getTotalPedido(int idPedido) {
+        return detallePedidoDao.getTotalPedido(idPedido);
     }
 }

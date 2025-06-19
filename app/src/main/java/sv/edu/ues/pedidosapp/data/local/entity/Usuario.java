@@ -2,6 +2,7 @@ package sv.edu.ues.pedidosapp.data.local.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "usuarios")
@@ -34,6 +35,7 @@ public class Usuario {
     }
 
     // Constructor completo
+    @Ignore
     public Usuario(String nombre, String email, String password, String telefono, String direccion, long fechaRegistro) {
         this.nombre = nombre;
         this.email = email;
