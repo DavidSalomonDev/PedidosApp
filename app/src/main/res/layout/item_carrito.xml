@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="12dp"
+        android:gravity="center_vertical">
 
         <ImageView
             android:id="@+id/item_carrito_imagen"
@@ -73,6 +74,17 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textStyle="bold" />
         </LinearLayout>
+
+        <!-- Botón eliminar a la derecha -->
+        <ImageButton
+            android:id="@+id/btn_eliminar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_menu_delete"
+            android:contentDescription="Eliminar"
+            android:layout_marginStart="8dp"
+            app:tint="?attr/colorError" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

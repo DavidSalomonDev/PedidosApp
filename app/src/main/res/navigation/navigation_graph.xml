@@ -24,4 +24,10 @@
             app:destination="@id/loginFragment" />
     </fragment>
 
+    <fragment
+        android:id="@+id/carritoFragment"
+        android:name="sv.edu.ues.pedidosapp.features.carrito.ui.CarritoFragment"
+        android:label="Carrito"
+        tools:layout="@layout/fragment_carrito" />
+
 </navigation>

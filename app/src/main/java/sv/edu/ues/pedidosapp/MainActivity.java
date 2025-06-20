@@ -25,6 +25,7 @@ import com.google.android.material.navigation.NavigationView;
 import sv.edu.ues.pedidosapp.data.local.AppDatabase;
 import sv.edu.ues.pedidosapp.data.local.SeedDataHelper;
 import sv.edu.ues.pedidosapp.features.auth.ui.LoginFragment;
+import sv.edu.ues.pedidosapp.features.carrito.ui.CarritoFragment;
 import sv.edu.ues.pedidosapp.features.configuracion.ui.ConfiguracionFragment;
 import sv.edu.ues.pedidosapp.features.configuracion.viewmodel.ConfiguracionViewModel;
 import sv.edu.ues.pedidosapp.features.core.ViewModelFactory;
@@ -141,7 +142,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.nav_catalogo) {
             displayFragment(new CatalogoFragment());
-        } else if (id == R.id.nav_pedidos) {
+        } else if (id == R.id.nav_carrito) {
+            displayFragment(new CarritoFragment());
+        }else if (id == R.id.nav_pedidos) {
             displayFragment(new ListaPedidosFragment());
         } else if (id == R.id.nav_configuracion) {
             displayFragment(new ConfiguracionFragment());

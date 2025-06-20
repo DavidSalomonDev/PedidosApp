@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -48,6 +49,9 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.CarritoV
         holder.precioTextView.setText(String.format("$%.2f", item.getProducto().getPrecio()));
         holder.cantidadTextView.setText(String.valueOf(item.getCantidad()));
         holder.subtotalTextView.setText(String.format("$%.2f", item.getSubtotal()));
+        holder.btnEliminar.setOnClickListener(v -> {
+            carritoViewModel.eliminarProducto(item.getProducto().getIdProducto());
+        });
 
         // Cargar imagen con Picasso
         Picasso.get()
@@ -68,6 +72,7 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.CarritoV
         TextView precioTextView;
         TextView cantidadTextView;
         TextView subtotalTextView;
+        ImageButton btnEliminar;
 
         CarritoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -76,6 +81,7 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.CarritoV
             precioTextView = itemView.findViewById(R.id.item_carrito_precio);
             cantidadTextView = itemView.findViewById(R.id.item_carrito_cantidad);
             subtotalTextView = itemView.findViewById(R.id.item_carrito_subtotal);
+            btnEliminar = itemView.findViewById(R.id.btn_eliminar);
         }
     }
 }

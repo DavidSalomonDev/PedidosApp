@@ -3,11 +3,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
+    <item android:title="Autenticación">
+        <menu>
+            <item
+                android:id="@+id/nav_login"
+                android:icon="@drawable/ic_menu_send"
+                android:title="@string/menu_login" />
+        </menu>
+    </item>
+
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_catalogo"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/menu_catalogo" />
+        <item
+            android:id="@+id/nav_carrito"
+            android:icon="@drawable/ic_cart"
+            android:title="Carrito" />
         <item
             android:id="@+id/nav_pedidos"
             android:icon="@drawable/ic_menu_gallery"
@@ -18,13 +31,6 @@
             android:title="@string/menu_configuracion" />
     </group>
 
-    <item android:title="Autenticación">
-        <menu>
-            <item
-                android:id="@+id/nav_login"
-                android:icon="@drawable/ic_menu_send"
-                android:title="@string/menu_login" />
-        </menu>
-    </item>
+
 
 </menu>

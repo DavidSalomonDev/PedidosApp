@@ -15,6 +15,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 import sv.edu.ues.pedidosapp.R;
 import sv.edu.ues.pedidosapp.features.carrito.viewmodel.CarritoViewModel;
 import sv.edu.ues.pedidosapp.features.pedidos.ui.AgregarPedidoDialogFragment;
@@ -64,6 +67,12 @@ public class CarritoFragment extends Fragment {
         // Observar cambios en el total del carrito
         carritoViewModel.getTotalCarrito().observe(getViewLifecycleOwner(), total -> {
             totalTextView.setText(String.format("Total: $%.2f", total));
+        });
+
+        FloatingActionButton fabVaciarCarrito = view.findViewById(R.id.fab_vaciar_carrito);
+        fabVaciarCarrito.setOnClickListener(v -> {
+            carritoViewModel.limpiarCarrito();
+            Snackbar.make(view, "Carrito vaciado", Snackbar.LENGTH_SHORT).show();
         });
     }
 

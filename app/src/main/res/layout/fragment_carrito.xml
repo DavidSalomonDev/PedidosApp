@@ -1,38 +1,59 @@
 <!-- res/layout/fragment_carrito.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Carrito de Compras"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
+    tools:context=".features.carrito.ui.CarritoFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_carrito"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="match_parent"
+        android:paddingBottom="96dp"
+        tools:listitem="@layout/item_carrito" />
 
-    <TextView
-        android:id="@+id/text_view_total"
+    <!-- Barra inferior con total y botón de crear pedido -->
+    <LinearLayout
+        android:id="@+id/barra_total"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Total: $0.00"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp" />
+        android:orientation="horizontal"
+        android:background="?attr/colorSurface"
+        android:padding="16dp"
+        android:elevation="8dp"
+        android:layout_gravity="bottom"
+        android:gravity="center_vertical">
 
-    <Button
-        android:id="@+id/button_crear_pedido"
-        android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/text_view_total"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Total: $0.00"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/button_crear_pedido"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Crear Pedido"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+
+    <!-- (Opcional) FAB para vaciar carrito o acción rápida -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_vaciar_carrito"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Crear Pedido"
-        android:layout_marginTop="16dp" />
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:contentDescription="Vaciar Carrito"
+        android:src="@drawable/ic_menu_delete"
+        app:backgroundTint="@color/colorAccent"
+        app:tint="@android:color/white" />
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
