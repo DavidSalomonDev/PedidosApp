@@ -10,4 +10,22 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="colorSecondary">#757575</color>
+    <color name="colorSecondaryText">#757575</color>
+    <color name="colorDivider">#E0E0E0</color>
+    <color name="colorError">#D32F2F</color>
+    <color name="colorErrorLight">#FFEBEE</color>
+    <color name="colorSuccess">#4CAF50</color>
+
+    <!--colores estado pedido -->
+    <color name="estado_pendiente">#2196F3</color>
+    <color name="estado_pendiente_border">#1976D2</color>
+    <color name="estado_proceso">#FF9800</color>
+    <color name="estado_completado">#4CAF50</color>
+    <color name="estado_cancelado">#F44336</color>
+
+    <!-- Color para los edits -->
+    <color name="edit_orange">#FF9800</color> <!-- Naranja Material 500 -->
+    <color name="edit_orange_dark">#F57C00</color> <!-- Naranja Material 700 -->
+    <color name="edit_orange_light">#FFE0B2</color> <!-- Naranja Material 200 -->
 </resources>

@@ -32,16 +32,24 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Total: $0.00"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorOnSurface"
             android:textStyle="bold" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_crear_pedido"
+            style="@style/Widget.Material3.Button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:minWidth="140dp"
             android:text="Crear Pedido"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_marginStart="16dp"/>
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="24dp"
+            app:iconPadding="0dp"
+            app:iconTint="@null"/>
     </LinearLayout>
 
     <!-- (Opcional) FAB para vaciar carrito o acción rápida -->

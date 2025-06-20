@@ -1,40 +1,75 @@
-<!-- res/layout/dialog_seleccionar_cantidad.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_margin="16dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardUseCompatPadding="true">
 
-    <TextView
-        android:id="@+id/text_view_nombre_producto"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Nombre del Producto"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <TextView
-        android:id="@+id/text_view_precio_producto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="$9.99"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:layout_marginTop="4dp" />
+        <!-- Nombre del Producto -->
+        <TextView
+            android:id="@+id/text_view_nombre_producto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nombre del Producto"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold"
+            android:textColor="@color/colorSecondaryText"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Cantidad:"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:layout_marginTop="16dp" />
+        <!-- Precio del Producto -->
+        <TextView
+            android:id="@+id/text_view_precio_producto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="$9.99"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginTop="4dp" />
 
-    <EditText
-        android:id="@+id/edit_text_cantidad"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="1"
-        android:inputType="number"
-        android:text="1"
-        android:padding="12dp" />
+        <!-- Sección Cantidad -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cantidad:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/colorSecondaryText" />
 
-</LinearLayout>
+        <!-- Selector de Cantidad -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxStrokeColor="@color/colorPrimary">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_cantidad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="1"
+                android:inputType="number"
+                android:text="1"
+                android:textSize="16sp"
+                android:padding="12dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
