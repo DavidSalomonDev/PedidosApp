@@ -12,14 +12,14 @@
         tools:listitem="@layout/item_pedido" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_agregar_pedido"
+        android:id="@+id/fab_ir_carrito"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:contentDescription="Agregar Pedido"
-        android:src="@drawable/ic_add"
-        app:backgroundTint="@color/colorAccent"
+        android:contentDescription="Ir al carrito"
+        android:src="@drawable/ic_cart"
+        app:backgroundTint="@color/colorPrimary"
         app:tint="@android:color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

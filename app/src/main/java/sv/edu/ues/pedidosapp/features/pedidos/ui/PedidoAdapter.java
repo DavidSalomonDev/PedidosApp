@@ -58,12 +58,12 @@ public class PedidoAdapter extends RecyclerView.Adapter<PedidoAdapter.PedidoView
             }
         });
 
-        // Botón editar
-        holder.btnEditar.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onEditarPedido(pedido.getIdPedido());
-            }
-        });
+//        // Botón editar
+//        holder.btnEditar.setOnClickListener(v -> {
+//            if (listener != null) {
+//                listener.onEditarPedido(pedido.getIdPedido());
+//            }
+//        });
 
         // Botón eliminar
         holder.btnEliminar.setOnClickListener(v -> {
@@ -107,7 +107,7 @@ public class PedidoAdapter extends RecyclerView.Adapter<PedidoAdapter.PedidoView
 
     public interface OnPedidoClickListener {
         void onPedidoClick(long idPedido);
-        void onEditarPedido(long idPedido);
+//        void onEditarPedido(long idPedido);
         void onEliminarPedido(long idPedido);
         void onCambiarEstado(long idPedido, String nuevoEstado);
     }
@@ -117,7 +117,7 @@ public class PedidoAdapter extends RecyclerView.Adapter<PedidoAdapter.PedidoView
         TextView fechaTextView;
         TextView estadoTextView;
         TextView totalTextView;
-        Button btnEditar;
+//        Button btnEditar;
         Button btnEliminar;
         Button btnCambiarEstado;
 
@@ -127,7 +127,6 @@ public class PedidoAdapter extends RecyclerView.Adapter<PedidoAdapter.PedidoView
             fechaTextView = itemView.findViewById(R.id.item_pedido_fecha);
             estadoTextView = itemView.findViewById(R.id.item_pedido_estado);
             totalTextView = itemView.findViewById(R.id.item_pedido_total);
-            btnEditar = itemView.findViewById(R.id.btn_editar_pedido);
             btnEliminar = itemView.findViewById(R.id.btn_eliminar_pedido);
             btnCambiarEstado = itemView.findViewById(R.id.btn_cambiar_estado);
         }

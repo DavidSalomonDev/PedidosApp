@@ -29,6 +29,19 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
     <TextView
+        android:id="@+id/textViewProductos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Productos:"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewProductos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
         android:id="@+id/text_view_total"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -192,12 +192,16 @@ public class LoginFragment extends Fragment {
     private void navigateToCatalog() {
         try {
             if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).displayFragment(new CatalogoFragment());
+                MainActivity mainActivity = (MainActivity) getActivity();
+                mainActivity.displayFragment(new CatalogoFragment());
+                mainActivity.loadUserData();
+                mainActivity.updateNavigationMenu();
             }
         } catch (Exception e) {
             Toast.makeText(getContext(), "Error al navegar", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     @Override
     public void onDestroyView() {

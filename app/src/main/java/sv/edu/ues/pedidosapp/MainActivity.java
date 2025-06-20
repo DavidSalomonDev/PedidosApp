@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.TextView;
 
@@ -21,6 +22,8 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.navigation.NavigationView;
+
+import java.util.Objects;
 
 import sv.edu.ues.pedidosapp.data.local.AppDatabase;
 import sv.edu.ues.pedidosapp.data.local.SeedDataHelper;
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+        updateNavigationMenu();
 
         // Configurar Navigation Drawer
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -144,18 +148,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             displayFragment(new CatalogoFragment());
         } else if (id == R.id.nav_carrito) {
             displayFragment(new CarritoFragment());
-        }else if (id == R.id.nav_pedidos) {
+        } else if (id == R.id.nav_pedidos) {
             displayFragment(new ListaPedidosFragment());
         } else if (id == R.id.nav_configuracion) {
             displayFragment(new ConfiguracionFragment());
-        } else if (id == R.id.nav_login) {
+        } else if (id == R.id.nav_logout) {
             // Cerrar sesión
-            logout();
+            showLogoutConfirmationDialog();
             displayFragment(new LoginFragment());
+            navigationView.setCheckedItem(R.id.nav_login);
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showLogoutConfirmationDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Cerrar sesión")
+                .setMessage("¿Estás seguro de que deseas cerrar sesión?")
+                .setPositiveButton("Sí", (dialog, which) -> {
+                    logout();
+                    displayFragment(new LoginFragment());
+                    navigationView.setCheckedItem(R.id.nav_login);
+                })
+                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     // Método para mostrar un fragmento
@@ -166,20 +184,54 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fragmentTransaction.commit();
     }
 
+    public void updateNavigationMenu() {
+        Menu menu = navigationView.getMenu();
+        boolean isLoggedIn = sessionManager.isLoggedIn();
+
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+
+            if (item.hasSubMenu()) {
+                // Submenú (como "Autenticación")
+                SubMenu subMenu = item.getSubMenu();
+                for (int j = 0; j < subMenu.size(); j++) {
+                    MenuItem subItem = subMenu.getItem(j);
+                    if (subItem.getItemId() == R.id.nav_login) {
+                        subItem.setVisible(!isLoggedIn);
+                    }
+                }
+                // Oculta el grupo si no tiene items visibles
+                item.setVisible(!isLoggedIn);
+            } else {
+                int itemId = item.getItemId();
+                if (itemId == R.id.nav_catalogo ||
+                        itemId == R.id.nav_carrito ||
+                        itemId == R.id.nav_pedidos ||
+                        itemId == R.id.nav_configuracion ||
+                        itemId == R.id.nav_logout) {
+                    item.setVisible(isLoggedIn);
+                }
+            }
+        }
+    }
+
     // Método para cargar datos del usuario desde SessionManager
     public void loadUserData() {
         if (sessionManager.isLoggedIn()) {
             String username = sessionManager.getUserName();
             String email = sessionManager.getUserEmail();
 
-            // Si el nombre está vacío, usar el email como nombre
+            // AGREGAR LOGS PARA DEBUG
+            System.out.println("DEBUG - Usuario logueado: " + username + " | " + email);
+
             if (username == null || username.trim().isEmpty()) {
-                username = email.split("@")[0]; // Usar la parte antes del @ como nombre
+                username = email.split("@")[0];
             }
 
             headerUsername.setText(username);
             headerEmail.setText(email);
         } else {
+            System.out.println("DEBUG - Usuario NO logueado");
             headerUsername.setText("Invitado");
             headerEmail.setText("invitado@example.com");
         }
@@ -188,7 +240,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // Método para cerrar sesión
     private void logout() {
         sessionManager.logout();
-        loadUserData(); // Actualizar header
+        loadUserData();
+        updateNavigationMenu();
     }
 
     // Método para cargar el tema desde SessionManager
@@ -215,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        // Actualizar datos del usuario cada vez que la actividad se reanuda
         loadUserData();
+        updateNavigationMenu();
     }
 }

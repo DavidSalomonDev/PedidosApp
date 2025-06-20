@@ -24,8 +24,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
+import sv.edu.ues.pedidosapp.MainActivity;
 import sv.edu.ues.pedidosapp.R;
 import sv.edu.ues.pedidosapp.data.local.entity.Pedido;
+import sv.edu.ues.pedidosapp.features.carrito.ui.CarritoFragment;
 import sv.edu.ues.pedidosapp.features.core.ViewModelFactory;
 import sv.edu.ues.pedidosapp.features.pedidos.viewmodel.PedidoViewModel;
 import sv.edu.ues.pedidosapp.utils.Constants;
@@ -68,10 +70,13 @@ public class ListaPedidosFragment extends Fragment implements PedidoAdapter.OnPe
         pedidoAdapter = new PedidoAdapter(getContext(), this);
         recyclerView.setAdapter(pedidoAdapter);
 
-        // Inicializar FloatingActionButton
-        fabAgregarPedido = view.findViewById(R.id.fab_agregar_pedido);
-        fabAgregarPedido.setOnClickListener(v -> {
-            mostrarDialogoAgregarPedido();
+        FloatingActionButton fabIrCarrito = view.findViewById(R.id.fab_ir_carrito);
+        fabIrCarrito.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Ir al carrito", Toast.LENGTH_SHORT).show();
+            // Navegar al fragmento del carrito
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).displayFragment(new CarritoFragment());
+            }
         });
 
         // Obtener ID del usuario logueado
@@ -191,12 +196,12 @@ public class ListaPedidosFragment extends Fragment implements PedidoAdapter.OnPe
         dialog.show(getChildFragmentManager(), "DetallePedidoDialog");
     }
 
-    @Override
-    public void onEditarPedido(long idPedido) {
-        // Mostrar diálogo para editar pedido
-        EditarPedidoDialogFragment dialog = EditarPedidoDialogFragment.newInstance((int) idPedido);
-        dialog.show(getChildFragmentManager(), "EditarPedidoDialog");
-    }
+//    @Override
+//    public void onEditarPedido(long idPedido) {
+//        // Mostrar diálogo para editar pedido
+//        EditarPedidoDialogFragment dialog = EditarPedidoDialogFragment.newInstance((int) idPedido);
+//        dialog.show(getChildFragmentManager(), "EditarPedidoDialog");
+//    }
 
     @Override
     public void onEliminarPedido(long idPedido) {

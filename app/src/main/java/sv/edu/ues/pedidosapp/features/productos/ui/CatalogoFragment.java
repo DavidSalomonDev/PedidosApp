@@ -18,8 +18,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+
+import sv.edu.ues.pedidosapp.MainActivity;
 import sv.edu.ues.pedidosapp.R;
 import sv.edu.ues.pedidosapp.data.local.entity.Producto;
+import sv.edu.ues.pedidosapp.features.carrito.ui.CarritoFragment;
 import sv.edu.ues.pedidosapp.features.carrito.viewmodel.CarritoViewModel;
 import sv.edu.ues.pedidosapp.features.core.ViewModelFactory;
 import sv.edu.ues.pedidosapp.features.productos.viewmodel.ProductoViewModel;
@@ -59,11 +64,17 @@ public class CatalogoFragment extends Fragment implements SearchView.OnQueryText
         productoAdapter = new ProductoAdapter(getContext(), this);
         recyclerView.setAdapter(productoAdapter);
 
-//        // Inicializar FloatingActionButton
-//        fabAgregarProducto = view.findViewById(R.id.fab_agregar_producto);
-//        fabAgregarProducto.setOnClickListener(v -> {
-//            mostrarDialogoAgregarProducto();
-//        });
+        FloatingActionButton fabIrCarrito = view.findViewById(R.id.fab_ir_carrito);
+        fabIrCarrito.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).displayFragment(new CarritoFragment());
+                // Opcional: actualiza el ítem seleccionado en el menú lateral
+                NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
+                if (navigationView != null) {
+                    navigationView.setCheckedItem(R.id.nav_carrito);
+                }
+            }
+        });
 
         // Observar cambios en la lista de productos
         productoViewModel.getAllProductosPagingData().observe(getViewLifecycleOwner(), productos -> {

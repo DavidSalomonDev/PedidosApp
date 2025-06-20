@@ -28,6 +28,7 @@ import sv.edu.ues.pedidosapp.features.core.ViewModelFactory;
 import sv.edu.ues.pedidosapp.features.detallepedido.viewmodel.DetallePedidoViewModel;
 import sv.edu.ues.pedidosapp.features.pedidos.viewmodel.PedidoViewModel;
 import sv.edu.ues.pedidosapp.utils.Constants;
+import sv.edu.ues.pedidosapp.utils.SessionManager;
 
 public class AgregarPedidoDialogFragment extends DialogFragment {
 
@@ -58,6 +59,19 @@ public class AgregarPedidoDialogFragment extends DialogFragment {
         clienteEditText = view.findViewById(R.id.edit_text_cliente);
         direccionEditText = view.findViewById(R.id.edit_text_direccion);
         totalTextView = view.findViewById(R.id.text_view_total);
+
+        SessionManager sessionManager = new SessionManager(requireContext());
+        if (sessionManager.isLoggedIn()) {
+            String nombre = sessionManager.getUserName();
+            String direccion = sessionManager.getUserAddress();
+
+            if (nombre != null && !nombre.isEmpty()) {
+                clienteEditText.setText(nombre);
+            }
+            if (direccion != null && !direccion.isEmpty()) {
+                direccionEditText.setText(direccion);
+            }
+        }
 
         // Mostrar el total del carrito
         carritoViewModel.getTotalCarrito().observe(this, total -> {
