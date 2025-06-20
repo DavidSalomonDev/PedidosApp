@@ -23,16 +23,15 @@ import sv.edu.ues.pedidosapp.features.pedidos.viewmodel.PedidoViewModel;
 public class DetallePedidoDialogFragment extends DialogFragment {
 
     private static final String ARG_ID_PEDIDO = "id_pedido";
-
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
     private TextView idTextView, fechaTextView, estadoTextView, totalTextView;
     private PedidoViewModel pedidoViewModel;
-    private int idPedido;
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+    private long idPedido;
 
-    public static DetallePedidoDialogFragment newInstance(int idPedido) {
+    public static DetallePedidoDialogFragment newInstance(long idPedido) {
         DetallePedidoDialogFragment fragment = new DetallePedidoDialogFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_ID_PEDIDO, idPedido);
+        args.putLong(ARG_ID_PEDIDO, idPedido);
         fragment.setArguments(args);
         return fragment;
     }
@@ -41,7 +40,7 @@ public class DetallePedidoDialogFragment extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            idPedido = getArguments().getInt(ARG_ID_PEDIDO);
+            idPedido = getArguments().getLong(ARG_ID_PEDIDO);
         }
     }
 

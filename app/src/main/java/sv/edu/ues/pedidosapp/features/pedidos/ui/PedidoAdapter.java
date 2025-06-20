@@ -22,9 +22,9 @@ import sv.edu.ues.pedidosapp.utils.Constants;
 public class PedidoAdapter extends RecyclerView.Adapter<PedidoAdapter.PedidoViewHolder> {
 
     private final Context context;
-    private List<Pedido> pedidos;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
     private final OnPedidoClickListener listener;
+    private List<Pedido> pedidos;
 
     public PedidoAdapter(Context context, OnPedidoClickListener listener) {
         this.context = context;
@@ -106,13 +106,10 @@ public class PedidoAdapter extends RecyclerView.Adapter<PedidoAdapter.PedidoView
     }
 
     public interface OnPedidoClickListener {
-        void onPedidoClick(int idPedido);
-
-        void onEditarPedido(int idPedido);
-
-        void onEliminarPedido(int idPedido);
-
-        void onCambiarEstado(int idPedido, String nuevoEstado);
+        void onPedidoClick(long idPedido);
+        void onEditarPedido(long idPedido);
+        void onEliminarPedido(long idPedido);
+        void onCambiarEstado(long idPedido, String nuevoEstado);
     }
 
     static class PedidoViewHolder extends RecyclerView.ViewHolder {

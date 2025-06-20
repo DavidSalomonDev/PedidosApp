@@ -9,6 +9,8 @@ import sv.edu.ues.pedidosapp.features.auth.viewmodel.AuthViewModel;
 import sv.edu.ues.pedidosapp.features.productos.viewmodel.ProductoViewModel;
 import sv.edu.ues.pedidosapp.features.pedidos.viewmodel.PedidoViewModel;
 import sv.edu.ues.pedidosapp.features.configuracion.viewmodel.ConfiguracionViewModel;
+import sv.edu.ues.pedidosapp.features.detallepedido.viewmodel.DetallePedidoViewModel;
+import sv.edu.ues.pedidosapp.features.carrito.viewmodel.CarritoViewModel;
 
 public class ViewModelFactory implements ViewModelProvider.Factory {
 
@@ -30,6 +32,10 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
             return (T) new PedidoViewModel(application);
         } else if (modelClass.isAssignableFrom(ConfiguracionViewModel.class)) {
             return (T) new ConfiguracionViewModel(application);
+        } else if (modelClass.isAssignableFrom(DetallePedidoViewModel.class)) {
+            return (T) new DetallePedidoViewModel(application);
+        } else if (modelClass.isAssignableFrom(CarritoViewModel.class)) {
+            return (T) new CarritoViewModel(application);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

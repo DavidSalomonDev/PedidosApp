@@ -8,9 +8,9 @@
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="android.widget.SearchView" />
 
-    <item
-        android:id="@+id/action_agregar_producto"
-        android:title="Agregar Producto"
-        app:showAsAction="never" />
+<!--    <item-->
+<!--        android:id="@+id/action_agregar_producto"-->
+<!--        android:title="Agregar Producto"-->
+<!--        app:showAsAction="never" />-->
 
 </menu>

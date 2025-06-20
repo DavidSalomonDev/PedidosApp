@@ -64,19 +64,19 @@ public class ProductoAdapter extends PagingDataAdapter<Producto, ProductoAdapter
                     .error(R.drawable.ic_launcher_background)
                     .into(holder.imagenImageView);
 
-            // Listener para el botón de editar
-            holder.editarImageView.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onEditarProducto(producto.getIdProducto());
-                }
-            });
+//            // Listener para el botón de editar
+//            holder.editarImageView.setOnClickListener(v -> {
+//                if (listener != null) {
+//                    listener.onEditarProducto(producto.getIdProducto());
+//                }
+//            });
 
-            // Listener para el botón de eliminar
-            holder.eliminarImageView.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onEliminarProducto(producto.getIdProducto());
-                }
-            });
+//            // Listener para el botón de eliminar
+//            holder.eliminarImageView.setOnClickListener(v -> {
+//                if (listener != null) {
+//                    listener.onEliminarProducto(producto.getIdProducto());
+//                }
+//            });
 
             // Listener para el botón de agregar al carrito
             holder.agregarCarritoButton.setOnClickListener(v -> {
@@ -94,9 +94,9 @@ public class ProductoAdapter extends PagingDataAdapter<Producto, ProductoAdapter
     }
 
     public interface OnProductoClickListener {
-        void onEditarProducto(int idProducto);
-
-        void onEliminarProducto(int idProducto);
+//        void onEditarProducto(int idProducto);
+//
+//        void onEliminarProducto(int idProducto);
 
         void onAgregarAlCarrito(Producto producto);
     }
@@ -106,8 +106,8 @@ public class ProductoAdapter extends PagingDataAdapter<Producto, ProductoAdapter
         TextView nombreTextView;
         TextView precioTextView;
         TextView categoriaTextView;
-        ImageView editarImageView;
-        ImageView eliminarImageView;
+        //        ImageView editarImageView;
+//        ImageView eliminarImageView;
         Button agregarCarritoButton;
 
         ProductoViewHolder(@NonNull View itemView) {
@@ -116,8 +116,8 @@ public class ProductoAdapter extends PagingDataAdapter<Producto, ProductoAdapter
             nombreTextView = itemView.findViewById(R.id.item_producto_nombre);
             precioTextView = itemView.findViewById(R.id.item_producto_precio);
             categoriaTextView = itemView.findViewById(R.id.item_producto_categoria);
-            editarImageView = itemView.findViewById(R.id.item_producto_editar);
-            eliminarImageView = itemView.findViewById(R.id.item_producto_eliminar);
+//            editarImageView = itemView.findViewById(R.id.item_producto_editar);
+//            eliminarImageView = itemView.findViewById(R.id.item_producto_eliminar);
             agregarCarritoButton = itemView.findViewById(R.id.btn_agregar_carrito);
         }
     }

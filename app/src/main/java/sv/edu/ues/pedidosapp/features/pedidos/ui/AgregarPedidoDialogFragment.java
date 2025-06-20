@@ -82,31 +82,26 @@ public class AgregarPedidoDialogFragment extends DialogFragment {
         String cliente = clienteEditText.getText().toString().trim();
         String direccion = direccionEditText.getText().toString().trim();
 
-        // Validaciones
         if (cliente.isEmpty() || direccion.isEmpty()) {
             Toast.makeText(getContext(), "Por favor, ingrese el nombre del cliente y la dirección", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Verificar que hay productos en el carrito
         List<ProductoSeleccionado> productosSeleccionados = carritoViewModel.getProductosSeleccionados().getValue();
         if (productosSeleccionados == null || productosSeleccionados.isEmpty()) {
             Toast.makeText(getContext(), "El carrito está vacío", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Obtener ID del usuario logueado
         long userId = sharedPreferences.getLong(Constants.PREF_USER_ID, -1);
         if (userId == -1) {
             Toast.makeText(getContext(), "Debe iniciar sesión para crear un pedido", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Calcular total
         Double total = carritoViewModel.getTotalCarrito().getValue();
         if (total == null) total = 0.0;
 
-        // Crear nuevo pedido
         Pedido pedido = new Pedido();
         pedido.setIdUsuario((int) userId);
         pedido.setDireccionEntrega(direccion);
@@ -115,41 +110,35 @@ public class AgregarPedidoDialogFragment extends DialogFragment {
         pedido.setTotal(total);
         pedido.setEstado(Constants.ESTADO_PENDIENTE);
 
-        // Insertar pedido
-        pedidoViewModel.insertPedido(pedido);
+        // Aquí el cambio: usar el future para obtener el ID insertado
+        pedidoViewModel.insertPedidoAndGetId(pedido).thenAccept(idPedido -> {
+            if (idPedido > 0) {
+                for (ProductoSeleccionado item : productosSeleccionados) {
+                    DetallePedido detalle = new DetallePedido();
+                    detalle.setIdPedido(idPedido);
+                    detalle.setIdProducto(item.getProducto().getIdProducto());
+                    detalle.setCantidad(item.getCantidad());
+                    detalle.setPrecioUnitario(item.getProducto().getPrecio());
+                    detalle.setSubtotal(item.getSubtotal());
 
-        // Observar el resultado de la inserción del pedido
-        pedidoViewModel.getOperationResult().observe(this, result -> {
-            if (result != null && result.contains("exitosamente")) {
-                // Obtener el último pedido insertado para obtener su ID
-                pedidoViewModel.getAllPedidos().observe(this, pedidos -> {
-                    if (pedidos != null && !pedidos.isEmpty()) {
-                        // Obtener el ID del pedido recién creado
-                        Pedido ultimoPedido = pedidos.get(pedidos.size() - 1);
-                        int idPedido = ultimoPedido.getIdPedido();
-
-                        // Crear detalles del pedido
-                        for (ProductoSeleccionado item : productosSeleccionados) {
-                            DetallePedido detalle = new DetallePedido();
-                            detalle.setIdPedido(idPedido);
-                            detalle.setIdProducto(item.getProducto().getIdProducto());
-                            detalle.setCantidad(item.getCantidad());
-                            detalle.setPrecioUnitario(item.getProducto().getPrecio());
-                            detalle.setSubtotal(item.getSubtotal());
-
-                            detallePedidoViewModel.insertDetallePedido(detalle);
-                        }
-
-                        // Limpiar el carrito
-                        carritoViewModel.limpiarCarrito();
-
-                        Toast.makeText(getContext(), "Pedido creado exitosamente", Toast.LENGTH_SHORT).show();
-                        dismiss();
-                    }
+                    detallePedidoViewModel.insertDetallePedido(detalle);
+                }
+                // Limpiar el carrito en el hilo principal
+                requireActivity().runOnUiThread(() -> {
+                    carritoViewModel.limpiarCarrito();
+                    Toast.makeText(getContext(), "Pedido creado exitosamente", Toast.LENGTH_SHORT).show();
+                    dismiss();
                 });
-            } else if (result != null) {
-                Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
+            } else {
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getContext(), "Error al crear el pedido", Toast.LENGTH_SHORT).show();
+                });
             }
+        }).exceptionally(throwable -> {
+            requireActivity().runOnUiThread(() -> {
+                Toast.makeText(getContext(), "Error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+            return null;
         });
     }
 }

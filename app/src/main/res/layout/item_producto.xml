@@ -33,19 +33,4 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Small" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/item_producto_editar"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginRight="8dp"
-        android:src="@android:drawable/ic_menu_edit" />
-
-    <ImageView
-        android:id="@+id/item_producto_eliminar"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center_vertical"
-        android:src="@android:drawable/ic_menu_delete" />
-
 </LinearLayout>

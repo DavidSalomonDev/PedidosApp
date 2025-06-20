@@ -13,13 +13,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import sv.edu.ues.pedidosapp.R;
 import sv.edu.ues.pedidosapp.data.local.entity.Producto;
@@ -33,7 +30,7 @@ public class CatalogoFragment extends Fragment implements SearchView.OnQueryText
     private CarritoViewModel carritoViewModel;
     private RecyclerView recyclerView;
     private ProductoAdapter productoAdapter;
-    private FloatingActionButton fabAgregarProducto;
+    //private FloatingActionButton fabAgregarProducto;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,11 +59,11 @@ public class CatalogoFragment extends Fragment implements SearchView.OnQueryText
         productoAdapter = new ProductoAdapter(getContext(), this);
         recyclerView.setAdapter(productoAdapter);
 
-        // Inicializar FloatingActionButton
-        fabAgregarProducto = view.findViewById(R.id.fab_agregar_producto);
-        fabAgregarProducto.setOnClickListener(v -> {
-            mostrarDialogoAgregarProducto();
-        });
+//        // Inicializar FloatingActionButton
+//        fabAgregarProducto = view.findViewById(R.id.fab_agregar_producto);
+//        fabAgregarProducto.setOnClickListener(v -> {
+//            mostrarDialogoAgregarProducto();
+//        });
 
         // Observar cambios en la lista de productos
         productoViewModel.getAllProductosPagingData().observe(getViewLifecycleOwner(), productos -> {
@@ -96,10 +93,10 @@ public class CatalogoFragment extends Fragment implements SearchView.OnQueryText
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_agregar_producto) {
-            mostrarDialogoAgregarProducto();
-            return true;
-        }
+//        if (id == R.id.action_agregar_producto) {
+//            mostrarDialogoAgregarProducto();
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -122,30 +119,30 @@ public class CatalogoFragment extends Fragment implements SearchView.OnQueryText
         });
     }
 
-    // Método para mostrar el diálogo de agregar producto
-    private void mostrarDialogoAgregarProducto() {
-        AgregarProductoDialogFragment dialog = new AgregarProductoDialogFragment();
-        dialog.show(getChildFragmentManager(), "AgregarProductoDialog");
-    }
+//    // Método para mostrar el diálogo de agregar producto
+//    private void mostrarDialogoAgregarProducto() {
+//        AgregarProductoDialogFragment dialog = new AgregarProductoDialogFragment();
+//        dialog.show(getChildFragmentManager(), "AgregarProductoDialog");
+//    }
 
-    // Implementar métodos de la interfaz OnProductoClickListener
-    @Override
-    public void onEditarProducto(int idProducto) {
-        EditarProductoDialogFragment dialog = EditarProductoDialogFragment.newInstance(idProducto);
-        dialog.show(getChildFragmentManager(), "EditarProductoDialog");
-    }
+//    // Implementar métodos de la interfaz OnProductoClickListener
+//    @Override
+//    public void onEditarProducto(int idProducto) {
+//        EditarProductoDialogFragment dialog = EditarProductoDialogFragment.newInstance(idProducto);
+//        dialog.show(getChildFragmentManager(), "EditarProductoDialog");
+//    }
 
-    @Override
-    public void onEliminarProducto(int idProducto) {
-        new AlertDialog.Builder(getContext())
-                .setTitle("Eliminar Producto")
-                .setMessage("¿Está seguro de que desea eliminar este producto?")
-                .setPositiveButton("Eliminar", (dialog, which) -> {
-                    productoViewModel.deleteProductoById(idProducto);
-                })
-                .setNegativeButton("Cancelar", null)
-                .show();
-    }
+//    @Override
+//    public void onEliminarProducto(int idProducto) {
+//        new AlertDialog.Builder(getContext())
+//                .setTitle("Eliminar Producto")
+//                .setMessage("¿Está seguro de que desea eliminar este producto?")
+//                .setPositiveButton("Eliminar", (dialog, which) -> {
+//                    productoViewModel.deleteProductoById(idProducto);
+//                })
+//                .setNegativeButton("Cancelar", null)
+//                .show();
+//    }
 
     @Override
     public void onAgregarAlCarrito(Producto producto) {

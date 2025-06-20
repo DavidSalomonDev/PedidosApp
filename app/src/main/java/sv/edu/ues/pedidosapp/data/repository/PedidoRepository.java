@@ -52,7 +52,7 @@ public class PedidoRepository {
     }
 
     // Obtener pedido por ID
-    public LiveData<Pedido> getPedidoById(int idPedido) {
+    public LiveData<Pedido> getPedidoById(long idPedido) {
         return pedidoDao.getPedidoById(idPedido);
     }
 
@@ -62,14 +62,14 @@ public class PedidoRepository {
     }
 
     // Actualizar estado del pedido
-    public CompletableFuture<Integer> updateEstadoPedido(int idPedido, String estado) {
+    public CompletableFuture<Integer> updateEstadoPedido(long idPedido, String estado) {
         return CompletableFuture.supplyAsync(() -> {
             return pedidoDao.updateEstadoPedido(idPedido, estado);
         }, executor);
     }
 
     // Eliminar pedido por ID
-    public CompletableFuture<Integer> deletePedidoById(int idPedido) {
+    public CompletableFuture<Integer> deletePedidoById(long idPedido) {
         return CompletableFuture.supplyAsync(() -> {
             return pedidoDao.deletePedidoById(idPedido);
         }, executor);

@@ -34,13 +34,17 @@ public class PedidoViewModel extends AndroidViewModel {
     }
 
     // Obtener pedido por ID
-    public LiveData<Pedido> getPedidoById(int idPedido) {
+    public LiveData<Pedido> getPedidoById(long idPedido) {
         return pedidoRepository.getPedidoById(idPedido);
     }
 
     // Obtener pedidos por estado
     public LiveData<List<Pedido>> getPedidosByEstado(String estado) {
         return pedidoRepository.getPedidosByEstado(estado);
+    }
+
+    public CompletableFuture<Long> insertPedidoAndGetId(Pedido pedido) {
+        return pedidoRepository.insertPedido(pedido);
     }
 
     // Insertar pedido
@@ -92,7 +96,7 @@ public class PedidoViewModel extends AndroidViewModel {
     }
 
     // Eliminar pedido por ID
-    public void deletePedidoById(int idPedido) {
+    public void deletePedidoById(long idPedido) {
         pedidoRepository.deletePedidoById(idPedido)
                 .thenAccept(result -> {
                     if (result > 0) {
@@ -108,7 +112,7 @@ public class PedidoViewModel extends AndroidViewModel {
     }
 
     // Actualizar estado del pedido
-    public void updateEstadoPedido(int idPedido, String nuevoEstado) {
+    public void updateEstadoPedido(long idPedido, String nuevoEstado) {
         pedidoRepository.updateEstadoPedido(idPedido, nuevoEstado)
                 .thenAccept(result -> {
                     if (result > 0) {

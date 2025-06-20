@@ -37,7 +37,7 @@ public interface PedidoDao {
 
     // Obtener pedido por ID
     @Query("SELECT * FROM pedidos WHERE id_pedido = :idPedido")
-    LiveData<Pedido> getPedidoById(int idPedido);
+    LiveData<Pedido> getPedidoById(long idPedido);
 
     // Obtener pedido por ID (síncrono)
     @Query("SELECT * FROM pedidos WHERE id_pedido = :idPedido")
@@ -53,7 +53,7 @@ public interface PedidoDao {
 
     // Actualizar estado del pedido
     @Query("UPDATE pedidos SET estado = :estado WHERE id_pedido = :idPedido")
-    int updateEstadoPedido(int idPedido, String estado);
+    int updateEstadoPedido(long idPedido, String estado);
 
     // Obtener pedidos por rango de fechas
     @Query("SELECT * FROM pedidos WHERE fecha_pedido BETWEEN :fechaInicio AND :fechaFin ORDER BY fecha_pedido DESC")
@@ -69,7 +69,7 @@ public interface PedidoDao {
 
     // Eliminar pedido por ID
     @Query("DELETE FROM pedidos WHERE id_pedido = :idPedido")
-    int deletePedidoById(int idPedido);
+    int deletePedidoById(long idPedido);
 
     // Obtener últimos pedidos (límite)
     @Query("SELECT * FROM pedidos ORDER BY fecha_pedido DESC LIMIT :limite")

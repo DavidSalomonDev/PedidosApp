@@ -12,15 +12,15 @@
         android:layout_height="match_parent"
         tools:listitem="@layout/item_producto" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_agregar_producto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:contentDescription="Agregar Producto"
-        android:src="@drawable/ic_add"
-        app:backgroundTint="@color/colorAccent"
-        app:tint="@android:color/white" />
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/fab_agregar_producto"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="bottom|end"-->
+<!--        android:layout_margin="16dp"-->
+<!--        android:contentDescription="Agregar Producto"-->
+<!--        android:src="@drawable/ic_add"-->
+<!--        app:backgroundTint="@color/colorAccent"-->
+<!--        app:tint="@android:color/white" />-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

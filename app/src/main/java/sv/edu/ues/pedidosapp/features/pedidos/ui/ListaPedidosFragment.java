@@ -32,12 +32,12 @@ import sv.edu.ues.pedidosapp.utils.Constants;
 
 public class ListaPedidosFragment extends Fragment implements PedidoAdapter.OnPedidoClickListener, SearchView.OnQueryTextListener {
 
+    private final List<Pedido> listaPedidosOriginal = new ArrayList<>();
     private PedidoViewModel pedidoViewModel;
     private RecyclerView recyclerView;
     private PedidoAdapter pedidoAdapter;
     private FloatingActionButton fabAgregarPedido;
     private SharedPreferences sharedPreferences;
-    private final List<Pedido> listaPedidosOriginal = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -182,23 +182,24 @@ public class ListaPedidosFragment extends Fragment implements PedidoAdapter.OnPe
         dialog.show(getChildFragmentManager(), "AgregarPedidoDialog");
     }
 
-    // Implementar métodos de la interfaz OnPedidoClickListener
+
+    // Implementar métodos de la interfaz OnPedidoClickListener (solo con long)
     @Override
-    public void onPedidoClick(int idPedido) {
+    public void onPedidoClick(long idPedido) {
         // Mostrar detalles del pedido
         DetallePedidoDialogFragment dialog = DetallePedidoDialogFragment.newInstance(idPedido);
         dialog.show(getChildFragmentManager(), "DetallePedidoDialog");
     }
 
     @Override
-    public void onEditarPedido(int idPedido) {
+    public void onEditarPedido(long idPedido) {
         // Mostrar diálogo para editar pedido
-        EditarPedidoDialogFragment dialog = EditarPedidoDialogFragment.newInstance(idPedido);
+        EditarPedidoDialogFragment dialog = EditarPedidoDialogFragment.newInstance((int) idPedido);
         dialog.show(getChildFragmentManager(), "EditarPedidoDialog");
     }
 
     @Override
-    public void onEliminarPedido(int idPedido) {
+    public void onEliminarPedido(long idPedido) {
         // Confirmar eliminación
         new androidx.appcompat.app.AlertDialog.Builder(getContext())
                 .setTitle("Eliminar Pedido")
@@ -211,7 +212,7 @@ public class ListaPedidosFragment extends Fragment implements PedidoAdapter.OnPe
     }
 
     @Override
-    public void onCambiarEstado(int idPedido, String nuevoEstado) {
+    public void onCambiarEstado(long idPedido, String nuevoEstado) {
         pedidoViewModel.updateEstadoPedido(idPedido, nuevoEstado);
     }
 }

@@ -18,7 +18,7 @@ public class Pedido {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id_pedido")
-    private int idPedido;
+    private long idPedido;
 
     @ColumnInfo(name = "id_usuario")
     private int idUsuario;
@@ -54,11 +54,11 @@ public class Pedido {
     }
 
     // Getters y Setters
-    public int getIdPedido() {
+    public long getIdPedido() {
         return idPedido;
     }
 
-    public void setIdPedido(int idPedido) {
+    public void setIdPedido(long idPedido) {
         this.idPedido = idPedido;
     }
 

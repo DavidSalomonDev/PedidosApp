@@ -30,7 +30,7 @@ public class DetallePedido {
     private int idDetalle;
 
     @ColumnInfo(name = "id_pedido")
-    private int idPedido;
+    private long idPedido;
 
     @ColumnInfo(name = "id_producto")
     private int idProducto;
@@ -50,7 +50,7 @@ public class DetallePedido {
 
     // Constructor con parámetros
     @Ignore
-    public DetallePedido(int idPedido, int idProducto, int cantidad, double precioUnitario) {
+    public DetallePedido(long idPedido, int idProducto, int cantidad, double precioUnitario) {
         this.idPedido = idPedido;
         this.idProducto = idProducto;
         this.cantidad = cantidad;
@@ -67,11 +67,11 @@ public class DetallePedido {
         this.idDetalle = idDetalle;
     }
 
-    public int getIdPedido() {
+    public long getIdPedido() {
         return idPedido;
     }
 
-    public void setIdPedido(int idPedido) {
+    public void setIdPedido(long idPedido) {
         this.idPedido = idPedido;
     }
 
